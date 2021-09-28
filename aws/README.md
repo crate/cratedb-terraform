@@ -6,7 +6,7 @@ This Terraform configuration will launch a CrateDB cluster on AWS. It consists o
 The provided configuration is meant as an easy way to get started. It is not necessarily production-ready in all aspects, such as backups, high availability, and security. Please clone and extend the configuration to fit your individual needs, if needed.
 
 ## Setup
-1. Crate a new Terraform configuration, referencing the CrateDB module:
+1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
 
   ```yaml
   module "cratedb-cluster" {
