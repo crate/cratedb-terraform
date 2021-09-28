@@ -62,7 +62,3 @@ Terraform will output the publicly accessible URL of the load balancer under whi
 
 ## Accessing Azure VMs
 Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
-
-## Development
-[TFLint](https://github.com/terraform-linters/tflint) is configured to check the code for issues.
-Run `tflint --init` to initialize it, and `tflint` to run it. See `.tflint.hcl` for configured plugins.
