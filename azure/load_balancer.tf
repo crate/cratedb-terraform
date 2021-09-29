@@ -25,7 +25,7 @@ resource "azurerm_lb_backend_address_pool" "main" {
 resource "azurerm_lb_probe" "http" {
   resource_group_name = azurerm_resource_group.rg.name
   loadbalancer_id = azurerm_lb.main.id
-  name = "crate-running-probe"
+  name = "crate-http-running-probe"
   port = 4200
   number_of_probes = 2
   protocol = "Tcp"
@@ -35,7 +35,7 @@ resource "azurerm_lb_probe" "http" {
 resource "azurerm_lb_probe" "postgresql" {
   resource_group_name = azurerm_resource_group.rg.name
   loadbalancer_id = azurerm_lb.main.id
-  name = "crate-running-probe"
+  name = "crate-postgresql-running-probe"
   port = 4200
   number_of_probes = 2
   protocol = "Tcp"

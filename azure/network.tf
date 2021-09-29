@@ -45,7 +45,7 @@ resource "azurerm_network_security_group" "nsg" {
     name = "SSH"
     priority = 102
     direction = "Inbound"
-    access = "Allow"
+    access = var.vm.ssh_access ? "Allow" : "Deny"
     protocol = "Tcp"
     source_port_range = "*"
     destination_port_range = "22"

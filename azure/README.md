@@ -45,6 +45,8 @@ The provided configuration is meant as an easy way to get started. It is not nec
       storage_account_type = "Premium_LRS"
       size = "Standard_DS12_v2"
 
+      # Enabling SSH access
+      ssh_access = true
       # Username to connect via SSH to the nodes
       user = "cratedb-vmadmin"
     }
@@ -71,3 +73,4 @@ Please note that it might take a couple of minutes before VMs are fully provisio
 
 ## Accessing Azure VMs
 Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
+In the default configuration, SSH access is enabled in the network security group. If can be disabled if needed via the `vm.ssh_access` variable.

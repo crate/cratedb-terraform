@@ -62,3 +62,9 @@ variable "subnet_ids" {
   type = list(string)
   description = "A list of subnet IDs deploy EC2 instances in. The corresponding availability zone must be at the same index in the availability_zones variable."
 }
+
+variable "ssh_access" {
+  type = bool
+  default = true
+  description = "Set to true, if inbound SSH access to EC2 instances should be allowed. Otherwise, set to false."
+}

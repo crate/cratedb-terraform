@@ -29,7 +29,7 @@ data "template_cloudinit_config" "config" {
   }
 }
 
-resource "aws_security_group" "cratedb_security_group" {
+resource "aws_security_group" "cratedb" {
   name = "${local.config.component_name}-sg"
   description = "Allow inbound CrateDB traffic"
   vpc_id  = var.vpc_id
@@ -62,18 +62,30 @@ resource "aws_security_group" "cratedb_security_group" {
   }
 
   egress {
-      from_port = 0
-      to_port = 0
-      protocol = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-    }
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
 
-    tags = {
-      Environment = local.config.environment
-      Owner = var.config.owner
-      Team = var.config.team
-    }
+  tags = {
+    Environment = local.config.environment
+    Owner = var.config.owner
+    Team = var.config.team
+  }
+}
+
+resource "aws_security_group_rule" "ssh" {
+  count = var.ssh_access ? 1 : 0
+
+  security_group_id = aws_security_group.cratedb.id
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
 }
 
 data "aws_ami" "ubuntu" {
@@ -95,7 +107,7 @@ resource "aws_network_interface" "interface" {
   count = var.crate.cluster_size
 
   subnet_id = element(var.subnet_ids, count.index)
-  security_groups = [aws_security_group.cratedb_security_group.id]
+  security_groups = [aws_security_group.cratedb.id]
 
   tags = {
     Name = "${local.config.component_name}-if-${count.index}"

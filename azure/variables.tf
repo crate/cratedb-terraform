@@ -32,6 +32,7 @@ variable "vm" {
         disk_size_gb = number
         storage_account_type = string
         size = string
+        ssh_access = bool
     })
 
     default = {
@@ -39,6 +40,7 @@ variable "vm" {
       disk_size_gb = 500
       storage_account_type = "Premium_LRS"
       size = "Standard_DS12_v2"
+      ssh_access = true
     }
 
     description = "Configuration of the Azure VMs"
