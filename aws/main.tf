@@ -156,7 +156,7 @@ resource "aws_instance" "cratedb_node" {
   count = var.crate.cluster_size
 
   ami = data.aws_ami.ubuntu.id
-  instance_type = "t3.xlarge"
+  instance_type = var.instance_type
   key_name = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
   user_data = data.template_cloudinit_config.config.rendered

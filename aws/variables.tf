@@ -42,6 +42,12 @@ variable "vpc_id" {
   description = "The ID of an existing VPC to deploy to"
 }
 
+variable "instance_type" {
+  type = string
+  default = "t3.xlarge"
+  description = "The EC2 instance type to use for nodes"
+}
+
 variable "ssh_keypair" {
   type = string
   description = "The name of an existing EC2 key pair"

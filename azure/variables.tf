@@ -31,7 +31,16 @@ variable "vm" {
         user = string
         disk_size_gb = number
         storage_account_type = string
+        size = string
     })
+
+    default = {
+      user = "cratedb-vmadmin"
+      disk_size_gb = 500
+      storage_account_type = "Premium_LRS"
+      size = "Standard_DS12_v2"
+    }
+
     description = "Configuration of the Azure VMs"
 }
 

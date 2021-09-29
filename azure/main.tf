@@ -243,7 +243,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
   computer_name = "node-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location = azurerm_resource_group.rg.location
-  size = "Standard_DS12_v2"
+  size = var.vm.size
 
   network_interface_ids = [element(azurerm_network_interface.crate.*.id, count.index)]
   availability_set_id = azurerm_availability_set.main.id

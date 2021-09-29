@@ -43,6 +43,7 @@ The provided configuration is meant as an easy way to get started. It is not nec
       # The size of the disk storing CrateDB's data directory
       disk_size_gb = 512
       storage_account_type = "Premium_LRS"
+      size = "Standard_DS12_v2"
 
       # Username to connect via SSH to the nodes
       user = "cratedb-vmadmin"
