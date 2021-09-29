@@ -49,6 +49,11 @@ The provided configuration is meant as an easy way to get started. It is not nec
     # The SSH key pair for EC2 instances
     ssh_keypair = "cratedb-cluster"
   }
+
+  output "cratedb" {
+    value = module.cratedb-cluster
+    sensitive = true
+  }
 ```
 
 2. Run `terraform init` to download and install all needed providers.
@@ -57,9 +62,10 @@ The provided configuration is meant as an easy way to get started. It is not nec
 To run the Terraform configuration:
 1. Run `terraform plan` to validate the planned resource creation
 2. Run `terraform apply` to execute the plan
+3. Run `terraform output -json` to view the cleartext output, such as the CrateDB URL and login credentials
 
 ## Accessing CrateDB
-Terraform will output the publicly accessible URL of the load balancer under which CrateDB will be accessible. On opening this URL in a browser, an HTTP Basic Auth should appear if the setup was successful. To retrieve the generated credentials from Terraform, you can run `terraform output -json`.
+The above last-mentioned step will output all needed information to connect to CrateDB. This includes the publicly accessible URL of the load balancer, as well as login credentials. On opening this URL in a browser, an HTTP Basic Auth appears.
 
 Please note that it might take a couple of minutes before instances are fully provisioned and CrateDB becomes accessible.
 
