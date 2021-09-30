@@ -1,0 +1,10 @@
+name: TFLint
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: terraform-linters/setup-tflint@v1
+      - run: cd aws && tflint --format compact
+      - run: cd azure && tflint --format compact
