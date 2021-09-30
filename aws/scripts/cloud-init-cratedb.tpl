@@ -13,12 +13,12 @@ packages:
   - python-pip
 
 bootcmd:
-  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t ext4 -L data /dev/nvme1n1
+  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
   - mkdir -p /opt/data
   - mount /dev/nvme1n1 /opt/data
 
 mounts:
-  - ["/dev/nvme1n1", "/opt/data", "ext4", auto, "defaults,noexec,nofail"]
+  - ["/dev/nvme1n1", "/opt/data", "xfs", auto, "defaults,noexec,nofail"]
 
 write_files:
   - content: |

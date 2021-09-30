@@ -21,7 +21,7 @@ disk_setup:
 fs_setup:
   - device: /dev/disk/azure/scsi1/lun1
     partition: 1
-    filesystem: ext4
+    filesystem: xfs
 
 mounts:
   - ["/dev/disk/azure/scsi1/lun1-part1", "/opt/data", auto, "defaults,noexec,nofail"]
