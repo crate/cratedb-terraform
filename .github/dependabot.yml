@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "terraform"
+    directory: "/aws"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "terraform"
+    directory: "/azure"
+    schedule:
+      interval: "daily"
