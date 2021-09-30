@@ -24,10 +24,10 @@ provider "aws" {
 }
 
 locals {
-    config = {
-        project_name = var.config.project_name
-        environment = var.config.environment
-        component_name = "${var.config.project_name}-${var.config.environment}"
-        crate_username = "admin"
-    }
+  config = {
+    project_name = var.config.project_name
+    environment = var.config.environment
+    component_name = "${var.config.project_name}-${var.config.environment}"
+    crate_username = "admin"
+  }
 }

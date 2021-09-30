@@ -18,35 +18,35 @@ variable "crate" {
   })
 
   default = {
-      heap_size_gb = 2
-      cluster_name = "CrateDB-Cluster"
-      cluster_size = 3
-    }
+    heap_size_gb = 2
+    cluster_name = "CrateDB-Cluster"
+    cluster_size = 3
+  }
 
-    description = "Configuration of the CrateDB application"
+  description = "Configuration of the CrateDB application"
 }
 
 variable "vm" {
-    type = object({
-        user = string
-        disk_size_gb = number
-        storage_account_type = string
-        size = string
-        ssh_access = bool
-    })
+  type = object({
+    user = string
+    disk_size_gb = number
+    storage_account_type = string
+    size = string
+    ssh_access = bool
+  })
 
-    default = {
-      user = "cratedb-vmadmin"
-      disk_size_gb = 500
-      storage_account_type = "Premium_LRS"
-      size = "Standard_DS12_v2"
-      ssh_access = true
-    }
+  default = {
+    user = "cratedb-vmadmin"
+    disk_size_gb = 500
+    storage_account_type = "Premium_LRS"
+    size = "Standard_DS12_v2"
+    ssh_access = true
+  }
 
-    description = "Configuration of the Azure VMs"
+  description = "Configuration of the Azure VMs"
 }
 
 variable "subscription_id" {
-    type = string
-    description = "The Azure subscription ID"
+  type = string
+  description = "The Azure subscription ID"
 }
