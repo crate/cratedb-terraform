@@ -1,10 +1,10 @@
 variable "config" {
   type = object({
-    environment = string
-    location = string
+    environment  = string
+    location     = string
     project_name = string
-    owner = string
-    team = string
+    owner        = string
+    team         = string
   })
 
   description = "Global configuration items"
@@ -28,25 +28,25 @@ variable "crate" {
 
 variable "vm" {
   type = object({
-    user = string
-    disk_size_gb = number
+    user                 = string
+    disk_size_gb         = number
     storage_account_type = string
-    size = string
-    ssh_access = bool
+    size                 = string
+    ssh_access           = bool
   })
 
   default = {
-    user = "cratedb-vmadmin"
-    disk_size_gb = 500
+    user                 = "cratedb-vmadmin"
+    disk_size_gb         = 500
     storage_account_type = "Premium_LRS"
-    size = "Standard_DS12_v2"
-    ssh_access = true
+    size                 = "Standard_DS12_v2"
+    ssh_access           = true
   }
 
   description = "Configuration of the Azure VMs"
 }
 
 variable "subscription_id" {
-  type = string
+  type        = string
   description = "The Azure subscription ID"
 }

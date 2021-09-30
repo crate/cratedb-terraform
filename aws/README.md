@@ -15,9 +15,9 @@ The provided configuration is meant as an easy way to get started. It is not nec
     # Global configuration items for naming/tagging resources
     config = {
       project_name = "example-project"
-      environment = "test"
-      owner = "Crate.IO"
-      team = "Customer Engineering"
+      environment  = "test"
+      owner        = "Crate.IO"
+      team         = "Customer Engineering"
     }
 
     # CrateDB-specific configuration
@@ -54,7 +54,7 @@ The provided configuration is meant as an easy way to get started. It is not nec
   }
 
   output "cratedb" {
-    value = module.cratedb-cluster
+    value     = module.cratedb-cluster
     sensitive = true
   }
 ```
