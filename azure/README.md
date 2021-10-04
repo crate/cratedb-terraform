@@ -19,9 +19,9 @@ The provided configuration is meant as an easy way to get started. It is not nec
     config = {
       # Used for naming/tagging Azure resources
       project_name = "example-project"
-      environment = "test"
-      owner = "Crate.IO"
-      team = "Customer Engineering"
+      environment  = "test"
+      owner        = "Crate.IO"
+      team         = "Customer Engineering"
 
       # Run "az account list-locations" for a full list
       location = "westeurope"
@@ -41,16 +41,19 @@ The provided configuration is meant as an easy way to get started. It is not nec
     # Azure VM specific configuration
     vm = {
       # The size of the disk storing CrateDB's data directory
-      disk_size_gb = 512
+      disk_size_gb         = 512
       storage_account_type = "Premium_LRS"
+      size                 = "Standard_DS12_v2"
 
+      # Enabling SSH access
+      ssh_access = true
       # Username to connect via SSH to the nodes
       user = "cratedb-vmadmin"
     }
   }
 
   output "cratedb" {
-    value = module.cratedb-cluster
+    value     = module.cratedb-cluster
     sensitive = true
   }
 ```
@@ -70,3 +73,4 @@ Please note that it might take a couple of minutes before VMs are fully provisio
 
 ## Accessing Azure VMs
 Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
+In the default configuration, SSH access is enabled in the network security group. If can be disabled if needed via the `vm.ssh_access` variable.

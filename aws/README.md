@@ -15,9 +15,9 @@ The provided configuration is meant as an easy way to get started. It is not nec
     # Global configuration items for naming/tagging resources
     config = {
       project_name = "example-project"
-      environment = "test"
-      owner = "Crate.IO"
-      team = "Customer Engineering"
+      environment  = "test"
+      owner        = "Crate.IO"
+      team         = "Customer Engineering"
     }
 
     # CrateDB-specific configuration
@@ -48,10 +48,13 @@ The provided configuration is meant as an easy way to get started. It is not nec
 
     # The SSH key pair for EC2 instances
     ssh_keypair = "cratedb-cluster"
+
+    # Enable SSH access to EC2 instances
+    ssh_access = true
   }
 
   output "cratedb" {
-    value = module.cratedb-cluster
+    value     = module.cratedb-cluster
     sensitive = true
   }
 ```
@@ -72,4 +75,4 @@ Please note that it might take a couple of minutes before instances are fully pr
 ## Accessing EC2 instances
 Your EC2 instances will only have a public IP address if the corresponding VPC subnet is configured to [auto-assign](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html) public IP addresses.
 
-Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration. SSH is not enabled by default in the security group.
+Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. If can be disabled if needed via the `ssh_access` variable.

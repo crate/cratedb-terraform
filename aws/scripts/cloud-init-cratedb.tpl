@@ -13,12 +13,12 @@ packages:
   - python-pip
 
 bootcmd:
-  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t ext4 -L data /dev/nvme1n1
+  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
   - mkdir -p /opt/data
   - mount /dev/nvme1n1 /opt/data
 
 mounts:
-  - ["/dev/nvme1n1", "/opt/data", "ext4", auto, "defaults,noexec,nofail"]
+  - ["/dev/nvme1n1", "/opt/data", "xfs", auto, "defaults,noexec,nofail"]
 
 write_files:
   - content: |
@@ -81,7 +81,6 @@ runcmd:
   - wget https://cdn.crate.io/downloads/deb/DEB-GPG-KEY-crate
   - apt-key add DEB-GPG-KEY-crate
   - add-apt-repository "deb https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
-  - add-apt-repository "deb-src https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
   - apt-get update -y
   - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
   - chown -R crate:crate /opt/data

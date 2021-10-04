@@ -1,0 +1,30 @@
+name: TFLint
+on: [push]
+jobs:
+  terraform_fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+      - run: terraform fmt -check -recursive
+
+  lint_aws:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws
+    steps:
+      - uses: actions/checkout@v2
+      - uses: terraform-linters/setup-tflint@v1
+      - run: tflint --init
+      - run: tflint --format compact
+
+  lint_azure:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: azure
+    steps:
+      - uses: actions/checkout@v2
+      - uses: terraform-linters/setup-tflint@v1
+      - run: tflint --init
+      - run: tflint --format compact

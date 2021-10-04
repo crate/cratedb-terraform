@@ -1,9 +1,9 @@
 variable "config" {
   type = object({
-    environment = string
+    environment  = string
     project_name = string
-    owner = string
-    team = string
+    owner        = string
+    team         = string
   })
 
   description = "Global configuration items"
@@ -26,33 +26,45 @@ variable "crate" {
 }
 
 variable "disk_size_gb" {
-  type = number
+  type        = number
   description = "The disk size in GB to use for CrateDB's data directory"
-  default = 500
+  default     = 500
 }
 
 variable "region" {
-  type = string
+  type        = string
   description = "The AWS region to deploy to"
-  default = "eu-central-1"
+  default     = "eu-central-1"
 }
 
 variable "vpc_id" {
-  type = string
+  type        = string
   description = "The ID of an existing VPC to deploy to"
 }
 
+variable "instance_type" {
+  type        = string
+  default     = "t3.xlarge"
+  description = "The EC2 instance type to use for nodes"
+}
+
 variable "ssh_keypair" {
-  type = string
+  type        = string
   description = "The name of an existing EC2 key pair"
 }
 
 variable "availability_zones" {
-  type = list(string)
+  type        = list(string)
   description = "A list of availability zones to deploy EC2 instances to. The corresponding subnet ID be at the same index in the subnet_ids variable."
 }
 
 variable "subnet_ids" {
-  type = list(string)
+  type        = list(string)
   description = "A list of subnet IDs deploy EC2 instances in. The corresponding availability zone must be at the same index in the availability_zones variable."
+}
+
+variable "ssh_access" {
+  type        = bool
+  default     = true
+  description = "Set to true, if inbound SSH access to EC2 instances should be allowed. Otherwise, set to false."
 }

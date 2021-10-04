@@ -21,7 +21,7 @@ disk_setup:
 fs_setup:
   - device: /dev/disk/azure/scsi1/lun1
     partition: 1
-    filesystem: ext4
+    filesystem: xfs
 
 mounts:
   - ["/dev/disk/azure/scsi1/lun1-part1", "/opt/data", auto, "defaults,noexec,nofail"]
@@ -88,7 +88,6 @@ runcmd:
   - wget https://cdn.crate.io/downloads/deb/DEB-GPG-KEY-crate
   - apt-key add DEB-GPG-KEY-crate
   - add-apt-repository "deb https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
-  - add-apt-repository "deb-src https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
   - apt-get update -y
   - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
   - chown -R crate:crate /opt/data

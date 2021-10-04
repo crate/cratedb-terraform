@@ -8,3 +8,5 @@ Supported environments are:
 ## Development
 [TFLint](https://github.com/terraform-linters/tflint) is configured to check the code for issues.
 Inside the respective subdirectories, run `tflint --init` to initialize it, and `tflint` to run it. Different `.tflint.hcl` configurations exist for each subdirectory.
+
+Before committing, please run `terraform tmf` to apply Terraform's standard configuration style consistently.
