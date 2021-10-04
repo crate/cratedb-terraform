@@ -1,4 +1,4 @@
-# crate-terraform
+# CrateDB Terraform Configurations
 This repository contains a collection of Terraform configurations to deploy a CrateDB cluster to various environments.
 
 Supported environments are:
