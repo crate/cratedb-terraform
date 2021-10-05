@@ -21,16 +21,20 @@ mounts:
   - ["/dev/nvme1n1", "/opt/data", "xfs", auto, "defaults,noexec,nofail"]
 
 write_files:
+  - content: !!binary |
+      ${crate_keystore}
+    path: /etc/crate/keystore.jks
+    permissions: "0555"
   - content: |
       sleep 30
-      curl -sS -H 'Content-Type: application/json' -X POST '127.0.0.1:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH(password = '\''${crate_pass}'\'');"}'
-      curl -sS -H 'Content-Type: application/json' -X POST '127.0.0.1:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH(password = '\''${crate_pass}'\'');"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
     owner: root:root
     path: /opt/deployment/finish.sh
     permissions: "0755"
   - content: |
         path.data:
-        - /opt/data
+          - /opt/data
         auth.host_based.enabled: true
         auth:
           host_based:
@@ -49,6 +53,11 @@ write_files:
             ${crate_nodes_ips}
         gateway.expected_nodes: ${crate_cluster_size}
         gateway.recover_after_nodes: ${crate_cluster_size}
+        ssl.http.enabled: ${crate_ssl_enable ? "true" : "false"}
+        ssl.psql.enabled: ${crate_ssl_enable ? "true" : "false"}
+        ssl.keystore_filepath: /etc/crate/keystore.jks
+        ssl.keystore_password: ${crate_ssl_keystore_password}
+        ssl.keystore_key_password: ${crate_ssl_keystore_key_password}
     owner: root:root
     path: /etc/crate/crate.yml
     permissions: "0755"

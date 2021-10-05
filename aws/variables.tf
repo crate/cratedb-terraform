@@ -11,15 +11,23 @@ variable "config" {
 
 variable "crate" {
   type = object({
-    heap_size_gb = number
-    cluster_name = string
-    cluster_size = number
+    heap_size_gb              = number
+    cluster_name              = string
+    cluster_size              = number
+    ssl_enable                = bool
+    ssl_keystore_filepath     = string
+    ssl_keystore_password     = string
+    ssl_keystore_key_password = string
   })
 
   default = {
-    heap_size_gb = 2
-    cluster_name = "CrateDB-Cluster"
-    cluster_size = 3
+    heap_size_gb              = 2
+    cluster_name              = "CrateDB-Cluster"
+    cluster_size              = 3
+    ssl_enable                = true
+    ssl_keystore_filepath     = ""
+    ssl_keystore_password     = "changeit"
+    ssl_keystore_key_password = "changeit"
   }
 
   description = "CrateDB application configuration"
