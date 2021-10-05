@@ -16,7 +16,7 @@ keytool -genkey -alias somealias -keyalg RSA -keypass changeit -storepass change
 The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
 
-  ```yaml
+  ```hcl
   module "cratedb-cluster" {
     source = "git@github.com:crate/crate-terraform.git//azure"
 
