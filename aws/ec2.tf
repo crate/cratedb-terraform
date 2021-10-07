@@ -4,17 +4,43 @@ resource "random_password" "cratedb_password" {
   override_special = "_%@"
 }
 
+resource "tls_private_key" "ssl" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "tls_self_signed_cert" "ssl" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.ssl.private_key_pem
+
+  # Set to two years. If the number is too high, there appears to be an overflow resulting in a date in the past
+  validity_period_hours = 17532
+
+  subject {
+    organization = var.config.team
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
 # Cloud Init script for initializing CrateDB
 data "template_file" "crate_provisioning" {
   template = file("${path.module}/scripts/cloud-init-cratedb.tpl")
 
   vars = {
-    crate_user         = local.config.crate_username
-    crate_pass         = random_password.cratedb_password.result
-    crate_heap_size    = var.crate.heap_size_gb
-    crate_cluster_name = var.crate.cluster_name
-    crate_cluster_size = var.crate.cluster_size
-    crate_nodes_ips    = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
+    crate_user            = local.config.crate_username
+    crate_pass            = random_password.cratedb_password.result
+    crate_heap_size       = var.crate.heap_size_gb
+    crate_cluster_name    = var.crate.cluster_name
+    crate_cluster_size    = var.crate.cluster_size
+    crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
+    crate_ssl_enable      = var.crate.ssl_enable
+    crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
+    crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
   }
 }
 
@@ -93,7 +119,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["*ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 
   filter {
@@ -138,6 +164,10 @@ resource "aws_instance" "cratedb_node" {
   ebs_block_device {
     device_name = "/dev/sdh"
     volume_size = var.disk_size_gb
+  }
+
+  lifecycle {
+    ignore_changes = [user_data]
   }
 
   tags = {

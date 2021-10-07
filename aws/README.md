@@ -6,9 +6,12 @@ This Terraform configuration will launch a CrateDB cluster on AWS. It consists o
 The provided configuration is meant as an easy way to get started. It is not necessarily production-ready in all aspects, such as backups, high availability, and security. Please clone and extend the configuration to fit your individual needs, if needed.
 
 ## Setup
+The Terraform configuration generates by default an individual self-signed SSL certificate. If `crate.ssl_enable` is set to false, SSL will be disabled.
+
+The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
 
-  ```yaml
+  ```hcl
   module "cratedb-cluster" {
     source = "git@github.com:crate/crate-terraform.git//aws"
 
@@ -29,6 +32,9 @@ The provided configuration is meant as an easy way to get started. It is not nec
 
       # The number of nodes the cluster will consist of
       cluster_size = 2
+
+      # Enables a self-signed SSL certificate
+      ssl_enable = true
     }
 
     # The disk size in GB to use for CrateDB's data directory
@@ -75,4 +81,4 @@ Please note that it might take a couple of minutes before instances are fully pr
 ## Accessing EC2 instances
 Your EC2 instances will only have a public IP address if the corresponding VPC subnet is configured to [auto-assign](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html) public IP addresses.
 
-Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. If can be disabled if needed via the `ssh_access` variable.
+Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. It can be disabled if needed via the `ssh_access` variable.

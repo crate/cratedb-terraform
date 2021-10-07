@@ -1,5 +1,5 @@
 output "cratedb_application_url" {
-  value       = "http://${azurerm_public_ip.main.fqdn}:4200"
+  value       = "http${var.crate.ssl_enable ? "s" : ""}://${azurerm_public_ip.main.fqdn}:4200"
   description = "The publicly accessible URL of the CrateDB cluster"
 }
 

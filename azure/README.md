@@ -6,9 +6,12 @@ This Terraform configuration will launch a CrateDB cluster on Azure. It consists
 The provided configuration is meant as an easy way to get started. It is not necessarily production-ready in all aspects, such as backups, high availability, and security. Please clone and extend the configuration to fit your individual needs, if needed.
 
 ## Setup
+The Terraform configuration generates by default an individual self-signed SSL certificate. If `crate.ssl_enable` is set to false, SSL will be disabled.
+
+The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
 
-  ```yaml
+  ```hcl
   module "cratedb-cluster" {
     source = "git@github.com:crate/crate-terraform.git//azure"
 
@@ -36,6 +39,9 @@ The provided configuration is meant as an easy way to get started. It is not nec
 
       # The number of nodes the cluster will consist of
       cluster_size = 2
+
+      # Enables a self-signed SSL certificate
+      ssl_enable = true
     }
 
     # Azure VM specific configuration
@@ -73,4 +79,4 @@ Please note that it might take a couple of minutes before VMs are fully provisio
 
 ## Accessing Azure VMs
 Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
-In the default configuration, SSH access is enabled in the network security group. If can be disabled if needed via the `vm.ssh_access` variable.
+In the default configuration, SSH access is enabled in the network security group. It can be disabled if needed via the `vm.ssh_access` variable.

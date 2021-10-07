@@ -1,5 +1,5 @@
 output "cratedb_application_url" {
-  value       = "http://${aws_lb.loadbalancer.dns_name}:4200"
+  value       = "http${var.crate.ssl_enable ? "s" : ""}://${aws_lb.loadbalancer.dns_name}:4200"
   description = "The publicly accessible URL of the CrateDB cluster"
 }
 

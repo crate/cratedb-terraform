@@ -14,12 +14,14 @@ variable "crate" {
     heap_size_gb = number
     cluster_name = string
     cluster_size = number
+    ssl_enable   = bool
   })
 
   default = {
     heap_size_gb = 2
     cluster_name = "CrateDB-Cluster"
     cluster_size = 3
+    ssl_enable   = true
   }
 
   description = "CrateDB application configuration"
