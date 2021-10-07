@@ -19,7 +19,7 @@ bootcmd:
   - mount /dev/nvme1n1 /opt/data
 
 mounts:
-  - ["/dev/nvme1n1", "/opt/data", "xfs", auto, "defaults,noexec,nofail"]
+  - ["/dev/nvme1n1", "/opt/data", "xfs", "defaults,noexec,nofail"]
 
 write_files:
   - content: !!binary |
