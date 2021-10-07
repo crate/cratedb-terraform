@@ -4,14 +4,14 @@ resource "random_password" "cratedb_password" {
   override_special = "_%@"
 }
 
-resource "tls_private_key" "example" {
+resource "tls_private_key" "ssl" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
-resource "tls_self_signed_cert" "example" {
+resource "tls_self_signed_cert" "ssl" {
   key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.example.private_key_pem
+  private_key_pem = tls_private_key.ssl.private_key_pem
 
   validity_period_hours = 10000000
 
@@ -38,8 +38,8 @@ data "template_file" "crate_provisioning" {
     crate_cluster_size    = var.crate.cluster_size
     crate_nodes_ips       = indent(12, yamlencode(azurerm_network_interface.crate.*.private_ip_address))
     crate_ssl_enable      = var.crate.ssl_enable
-    crate_ssl_certificate = base64encode(tls_self_signed_cert.example.cert_pem)
-    crate_ssl_private_key = base64encode(tls_private_key.example.private_key_pem)
+    crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
+    crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
   }
 }
 
