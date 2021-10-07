@@ -4,21 +4,42 @@ resource "random_password" "cratedb_password" {
   override_special = "_%@"
 }
 
+resource "tls_private_key" "example" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "tls_self_signed_cert" "example" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.example.private_key_pem
+
+  validity_period_hours = 10000000
+
+  subject {
+    organization = var.config.team
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
 # Cloud Init script for initializing CrateDB
 data "template_file" "crate_provisioning" {
   template = file("${path.module}/scripts/cloud-init-cratedb.tpl")
 
   vars = {
-    crate_user                      = local.config.crate_username
-    crate_pass                      = random_password.cratedb_password.result
-    crate_heap_size                 = var.crate.heap_size_gb
-    crate_cluster_name              = var.crate.cluster_name
-    crate_cluster_size              = var.crate.cluster_size
-    crate_nodes_ips                 = indent(12, yamlencode(azurerm_network_interface.crate.*.private_ip_address))
-    crate_ssl_enable                = var.crate.ssl_enable
-    crate_keystore                  = filebase64(var.crate.ssl_keystore_filepath == "" ? "${path.module}/files/keystore.jks" : var.crate.ssl_keystore_filepath)
-    crate_ssl_keystore_password     = var.crate.ssl_keystore_password
-    crate_ssl_keystore_key_password = var.crate.ssl_keystore_key_password
+    crate_user            = local.config.crate_username
+    crate_pass            = random_password.cratedb_password.result
+    crate_heap_size       = var.crate.heap_size_gb
+    crate_cluster_name    = var.crate.cluster_name
+    crate_cluster_size    = var.crate.cluster_size
+    crate_nodes_ips       = indent(12, yamlencode(azurerm_network_interface.crate.*.private_ip_address))
+    crate_ssl_enable      = var.crate.ssl_enable
+    crate_ssl_certificate = base64encode(tls_self_signed_cert.example.cert_pem)
+    crate_ssl_private_key = base64encode(tls_private_key.example.private_key_pem)
   }
 }
 
