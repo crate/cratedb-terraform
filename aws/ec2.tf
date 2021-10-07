@@ -166,6 +166,10 @@ resource "aws_instance" "cratedb_node" {
     volume_size = var.disk_size_gb
   }
 
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+
   tags = {
     Name        = "${local.config.component_name}-node-${count.index}"
     Environment = local.config.environment
