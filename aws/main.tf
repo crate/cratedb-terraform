@@ -16,6 +16,11 @@ terraform {
       source  = "random"
       version = "~> 3.1"
     }
+
+    tls = {
+      source  = "tls"
+      version = "~> 3.1"
+    }
   }
 }
 

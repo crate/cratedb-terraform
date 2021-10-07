@@ -11,6 +11,7 @@ packages:
   - gnupg-agent
   - software-properties-common
   - python-pip
+  - openssl
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
@@ -22,9 +23,13 @@ mounts:
 
 write_files:
   - content: !!binary |
-      ${crate_keystore}
-    path: /etc/crate/keystore.jks
-    permissions: "0555"
+      ${crate_ssl_private_key}
+    path: /etc/crate/private_key.pem
+    permissions: "0660"
+  - content: !!binary |
+      ${crate_ssl_certificate}
+    path: /etc/crate/certificate.pem
+    permissions: "0660"
   - content: |
       sleep 30
       curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH(password = '\''${crate_pass}'\'');"}'
@@ -55,9 +60,9 @@ write_files:
         gateway.recover_after_nodes: ${crate_cluster_size}
         ssl.http.enabled: ${crate_ssl_enable ? "true" : "false"}
         ssl.psql.enabled: ${crate_ssl_enable ? "true" : "false"}
-        ssl.keystore_filepath: /etc/crate/keystore.jks
-        ssl.keystore_password: ${crate_ssl_keystore_password}
-        ssl.keystore_key_password: ${crate_ssl_keystore_key_password}
+        ssl.keystore_filepath: /etc/crate/keystore.p12
+        ssl.keystore_password: changeit
+        ssl.keystore_key_password: changeit
     owner: root:root
     path: /etc/crate/crate.yml
     permissions: "0755"
@@ -87,6 +92,8 @@ write_files:
 
 runcmd:
   - chmod 777 /opt/data
+  - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
+  - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
   - wget https://cdn.crate.io/downloads/deb/DEB-GPG-KEY-crate
   - apt-key add DEB-GPG-KEY-crate
   - add-apt-repository "deb https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"

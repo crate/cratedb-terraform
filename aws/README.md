@@ -6,12 +6,7 @@ This Terraform configuration will launch a CrateDB cluster on AWS. It consists o
 The provided configuration is meant as an easy way to get started. It is not necessarily production-ready in all aspects, such as backups, high availability, and security. Please clone and extend the configuration to fit your individual needs, if needed.
 
 ## Setup
-The configuration comes by default with a self-signed SSL certificate. You can deploy your own certificate by passing a custom Java keystore location using the variable `crate.ssl_keystore_filepath`. In this case, also change the `crate.ssl_keystore_password` and `crate.ssl_keystore_key_password` variables for the keystore password and key password accordingly.
-
-To generate your own self-signed certificate, you can use this command:
-```bash
-keytool -genkey -alias somealias -keyalg RSA -keypass changeit -storepass changeit -keystore keystore.jks -keysize 2048 -validity 1461
-```
+The Terraform configuration generates by default an individual self-signed SSL certificate. If `crate.ssl_enable` is set to false, SSL will be disabled.
 
 The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
@@ -38,11 +33,8 @@ The main setup consists of the following steps:
       # The number of nodes the cluster will consist of
       cluster_size = 2
 
-      # Default SSL configuration to use the bundled self-signed certificate
-      ssl_enable                = true
-      ssl_keystore_filepath     = ""
-      ssl_keystore_password     = "changeit"
-      ssl_keystore_key_password = "changeit"
+      # Enables a self-signed SSL certificate
+      ssl_enable = true
     }
 
     # The disk size in GB to use for CrateDB's data directory
@@ -89,4 +81,4 @@ Please note that it might take a couple of minutes before instances are fully pr
 ## Accessing EC2 instances
 Your EC2 instances will only have a public IP address if the corresponding VPC subnet is configured to [auto-assign](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html) public IP addresses.
 
-Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. If can be disabled if needed via the `ssh_access` variable.
+Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. It can be disabled if needed via the `ssh_access` variable.

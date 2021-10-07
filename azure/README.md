@@ -6,12 +6,7 @@ This Terraform configuration will launch a CrateDB cluster on Azure. It consists
 The provided configuration is meant as an easy way to get started. It is not necessarily production-ready in all aspects, such as backups, high availability, and security. Please clone and extend the configuration to fit your individual needs, if needed.
 
 ## Setup
-The configuration comes by default with a self-signed SSL certificate. You can deploy your own certificate by passing a custom Java keystore location using the variable `crate.ssl_keystore_filepath`. In this case, also change the `crate.ssl_keystore_password` and `crate.ssl_keystore_key_password` variables for the keystore password and key password accordingly.
-
-To generate your own self-signed certificate, you can use this command:
-```bash
-keytool -genkey -alias somealias -keyalg RSA -keypass changeit -storepass changeit -keystore keystore.jks -keysize 2048 -validity 1461
-```
+The Terraform configuration generates by default an individual self-signed SSL certificate. If `crate.ssl_enable` is set to false, SSL will be disabled.
 
 The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
@@ -45,11 +40,8 @@ The main setup consists of the following steps:
       # The number of nodes the cluster will consist of
       cluster_size = 2
 
-      # Default SSL configuration to use the bundled self-signed certificate
-      ssl_enable                = true
-      ssl_keystore_filepath     = ""
-      ssl_keystore_password     = "changeit"
-      ssl_keystore_key_password = "changeit"
+      # Enables a self-signed SSL certificate
+      ssl_enable = true
     }
 
     # Azure VM specific configuration
@@ -87,4 +79,4 @@ Please note that it might take a couple of minutes before VMs are fully provisio
 
 ## Accessing Azure VMs
 Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
-In the default configuration, SSH access is enabled in the network security group. If can be disabled if needed via the `vm.ssh_access` variable.
+In the default configuration, SSH access is enabled in the network security group. It can be disabled if needed via the `vm.ssh_access` variable.
