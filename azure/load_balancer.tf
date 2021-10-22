@@ -50,7 +50,7 @@ resource "azurerm_lb_rule" "cratedb_http" {
   frontend_port                  = 4200
   backend_port                   = 4200
   frontend_ip_configuration_name = "publicIPAddress"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]
   probe_id                       = azurerm_lb_probe.http.id
 }
 
@@ -62,6 +62,6 @@ resource "azurerm_lb_rule" "cratedb_postgresql" {
   frontend_port                  = 5432
   backend_port                   = 5432
   frontend_ip_configuration_name = "publicIPAddress"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.main.id]
   probe_id                       = azurerm_lb_probe.postgresql.id
 }
