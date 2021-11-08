@@ -4,8 +4,14 @@ updates:
     directory: "/aws"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "hashicorp/aws"
+        update-types: ["version-update:semver-minor"]
 
   - package-ecosystem: "terraform"
     directory: "/azure"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "hashicorp/azurerm"
+        update-types: ["version-update:semver-minor"]
