@@ -41,7 +41,13 @@ variable "disk_type" {
 
 variable "disk_iops" {
   type        = number
-  description = "Amount of provisioned IOPS of the disk to use for CrateDB's data directory"
+  description = "Number of provisioned IOPS of the disk to use for CrateDB's data directory"
+  default     = null
+}
+
+variable "disk_throughput" {
+  type        = number
+  description = "Amount of provisioned throughput of the disk to use for CrateDB's data directory (gp3 only)"
   default     = null
 }
 
