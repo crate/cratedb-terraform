@@ -7,6 +7,7 @@ The provided configuration is meant as an easy way to get started. It is not nec
 
 ## Setup
 The Terraform configuration generates by default an individual self-signed SSL certificate. If `crate.ssl_enable` is set to false, SSL will be disabled.
+For a full list of available variables (including disk configuration), please see [variables.tf](variables.tf).
 
 The main setup consists of the following steps:
 1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
