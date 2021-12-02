@@ -36,7 +36,7 @@ variable "disk_size_gb" {
 variable "disk_type" {
   type        = string
   description = "The disk type to use for CrateDB's data directory"
-  default     = "gp2"
+  default     = "gp3"
 }
 
 variable "disk_iops" {
