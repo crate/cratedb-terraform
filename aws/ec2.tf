@@ -114,19 +114,15 @@ resource "aws_security_group_rule" "ssh" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "amazon_linux" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["amzn2-ami-hvm*"]
   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  owners = ["099720109477"] # Canonical
+  owners = ["amazon"]
 }
 
 resource "aws_network_interface" "interface" {
@@ -146,7 +142,7 @@ resource "aws_network_interface" "interface" {
 resource "aws_instance" "cratedb_node" {
   count = var.crate.cluster_size
 
-  ami               = data.aws_ami.ubuntu.id
+  ami               = data.aws_ami.amazon_linux.id
   instance_type     = var.instance_type
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)

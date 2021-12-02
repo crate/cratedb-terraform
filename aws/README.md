@@ -82,4 +82,4 @@ Please note that it might take a couple of minutes before instances are fully pr
 ## Accessing EC2 instances
 Your EC2 instances will only have a public IP address if the corresponding VPC subnet is configured to [auto-assign](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html) public IP addresses.
 
-Connecting via SSH can be done using the `ubuntu` user and the configured key pair. In the default configuration, SSH access is enabled in the security group. It can be disabled if needed via the `ssh_access` variable.
+Connecting via SSH can be done using the `ec2-user` account and the configured key pair. In the default configuration, SSH access is enabled in the security group. It can be disabled if needed via the `ssh_access` variable.

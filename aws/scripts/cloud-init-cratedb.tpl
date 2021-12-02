@@ -5,21 +5,16 @@ package_upgrade: true
 package_reboot_if_required: true
 
 packages:
-  - apt-transport-https
-  - ca-certificates
   - curl
-  - gnupg-agent
-  - software-properties-common
-  - python-pip
   - openssl
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
   - mkdir -p /opt/data
-  - mount /dev/nvme1n1 /opt/data
+  - mount LABEL=data /opt/data
 
 mounts:
-  - ["/dev/nvme1n1", "/opt/data", "xfs", "defaults,noexec,nofail"]
+  - ["LABEL=data", "/opt/data", "xfs", "defaults,noexec,nofail"]
 
 write_files:
   - content: !!binary |
@@ -87,20 +82,20 @@ write_files:
       # Force the JVM to use IPv4 stack
       CRATE_USE_IPV4=true
     owner: root:root
-    path: /etc/default/crate
+    path: /etc/sysconfig/crate
     permissions: "0755"
 
 runcmd:
   - chmod 777 /opt/data
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
-  - wget https://cdn.crate.io/downloads/deb/DEB-GPG-KEY-crate
-  - apt-key add DEB-GPG-KEY-crate
-  - add-apt-repository "deb https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
-  - apt-get update -y
-  - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
+  - rpm --import https://cdn.crate.io/downloads/yum/RPM-GPG-KEY-crate
+  - rpm -Uvh https://cdn.crate.io/downloads/yum/7/x86_64/crate-release-7.0-1.x86_64.rpm
+  - yum install -y crate
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
+  - systemctl enable crate
+  - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
 
 final_message: "The system is finally up, after $UPTIME seconds"
