@@ -162,6 +162,7 @@ resource "aws_instance" "cratedb_node" {
     volume_size = var.disk_size_gb
     volume_type = var.disk_type
     iops        = var.disk_iops
+    throughput  = var.disk_throughput
   }
 
   lifecycle {
