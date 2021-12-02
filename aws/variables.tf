@@ -33,6 +33,18 @@ variable "disk_size_gb" {
   default     = 500
 }
 
+variable "disk_type" {
+  type        = string
+  description = "The disk type to use for CrateDB's data directory"
+  default     = "gp2"
+}
+
+variable "disk_iops" {
+  type        = number
+  description = "Amount of provisioned IOPS of the disk to use for CrateDB's data directory"
+  default     = null
+}
+
 variable "region" {
   type        = string
   description = "The AWS region to deploy to"

@@ -164,6 +164,8 @@ resource "aws_instance" "cratedb_node" {
   ebs_block_device {
     device_name = "/dev/sdh"
     volume_size = var.disk_size_gb
+    volume_type = var.disk_type
+    iops        = var.disk_iops
   }
 
   lifecycle {
