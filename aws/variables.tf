@@ -6,6 +6,13 @@ variable "config" {
     team         = string
   })
 
+  default = {
+    project_name = "example-project"
+    environment  = "test"
+    owner        = "Crate.IO"
+    team         = "Customer Engineering"
+  }
+
   description = "Global configuration items"
 }
 
