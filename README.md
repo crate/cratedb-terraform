@@ -25,7 +25,7 @@ AWS_TEST_AVAILABILITY_ZONES="[\"eu-central-1b\", \"eu-central-1a\"]"
 AZURE_TEST_SUBSCRIPTION_ID=abc
 ```
 
-To run the test, load the environment variables and pass them to `go test`:
+To run the test, load the environment variables and pass them to `go test` (see [run.sh](test/run.sh)):
 ```shell
 cd test
 source .env
@@ -33,5 +33,8 @@ AWS_TEST_VPC_ID=$AWS_TEST_VPC_ID \
 AWS_TEST_SSH_KEYPAIR=$AWS_TEST_SSH_KEYPAIR \
 AWS_TEST_SUBNET_IDS=$AWS_TEST_SUBNET_IDS \
 AWS_TEST_AVAILABILITY_ZONES=$AWS_TEST_AVAILABILITY_ZONES \
+AZURE_TEST_SUBSCRIPTION_ID=$AZURE_TEST_SUBSCRIPTION_ID \
 go test
 ```
+
+If you want to run only a single test, you can specific the name of the test, e.g. `go test -run TestTerraformAzure`.

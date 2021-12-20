@@ -1,6 +1,11 @@
 output "cratedb_application_url" {
   value       = "http${var.crate.ssl_enable ? "s" : ""}://${azurerm_public_ip.main.fqdn}:4200"
-  description = "The publicly accessible URL of the CrateDB cluster"
+  description = "The publicly accessible domain name of the CrateDB cluster"
+}
+
+output "cratedb_application_url_ip" {
+  value       = "http${var.crate.ssl_enable ? "s" : ""}://${azurerm_public_ip.main.ip_address}:4200"
+  description = "The publicly accessible IP of the CrateDB cluster"
 }
 
 output "cratedb_username" {
