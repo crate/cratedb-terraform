@@ -15,3 +15,8 @@ updates:
     ignore:
       - dependency-name: "hashicorp/azurerm"
         update-types: ["version-update:semver-minor"]
+
+  - package-ecosystem: "gomod"
+    directory: "/test"
+    schedule:
+      interval: "monthly"
