@@ -8,7 +8,6 @@ import (
 	"crypto/tls"
 	"bytes"
 	"io/ioutil"
-	"time"
 	"errors"
 	"context"
 )
@@ -18,8 +17,7 @@ func RunCrateDBQuery(clusterUrl string, username string, password string) (map[s
 	client.HTTPClient.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	client.RetryWaitMin = 5 * time.Minute
-	client.RetryMax = 40
+	client.RetryMax = 20
 	client.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
 		ok, e := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
 		// During bootstrapping, there is a point in time when the cluster is up but the admin user not created yet.
