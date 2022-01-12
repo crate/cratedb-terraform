@@ -3,6 +3,7 @@ package test
 import (
 	"testing"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/assert"
 	"fmt"
 	"os"
@@ -16,6 +17,7 @@ func TestTerraformAws(t *testing.T) {
 			"ssh_keypair": os.Getenv("AWS_TEST_SSH_KEYPAIR"),
 			"subnet_ids": os.Getenv("AWS_TEST_SUBNET_IDS"),
 			"availability_zones": os.Getenv("AWS_TEST_AVAILABILITY_ZONES"),
+			"config": fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\"}", random.UniqueId()),
 			"crate": "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
 		},
 	})
