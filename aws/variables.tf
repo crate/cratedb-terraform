@@ -82,7 +82,7 @@ variable "ssh_keypair" {
 
 variable "availability_zones" {
   type        = list(string)
-  description = "A list of availability zones to deploy EC2 instances to. The corresponding subnet ID be at the same index in the subnet_ids variable."
+  description = "A list of availability zones to deploy EC2 instances to. The corresponding subnet ID must be at the same index in the subnet_ids variable."
 }
 
 variable "subnet_ids" {
