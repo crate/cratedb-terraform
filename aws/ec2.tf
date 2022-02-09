@@ -94,12 +94,6 @@ resource "aws_security_group" "cratedb" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
-
-  tags = {
-    Environment = local.config.environment
-    Owner       = var.config.owner
-    Team        = var.config.team
-  }
 }
 
 resource "aws_security_group_rule" "ssh" {
@@ -132,10 +126,7 @@ resource "aws_network_interface" "interface" {
   security_groups = [aws_security_group.cratedb.id]
 
   tags = {
-    Name        = "${local.config.component_name}-if-${count.index}"
-    Environment = local.config.environment
-    Owner       = var.config.owner
-    Team        = var.config.team
+    Name = "${local.config.component_name}-if-${count.index}"
   }
 }
 
@@ -170,10 +161,7 @@ resource "aws_instance" "cratedb_node" {
   }
 
   tags = {
-    Name        = "${local.config.component_name}-node-${count.index}"
-    Environment = local.config.environment
-    Owner       = var.config.owner
-    Team        = var.config.team
+    Name = "${local.config.component_name}-node-${count.index}"
   }
 }
 
