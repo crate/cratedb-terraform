@@ -26,6 +26,14 @@ terraform {
 
 provider "aws" {
   region = var.region
+
+  default_tags {
+    tags = {
+      Environment = local.config.environment
+      Owner       = var.config.owner
+      Team        = var.config.team
+    }
+  }
 }
 
 locals {
