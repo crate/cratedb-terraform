@@ -95,3 +95,25 @@ variable "ssh_access" {
   default     = true
   description = "Set to true, if inbound SSH access to EC2 instances should be allowed. Otherwise, set to false."
 }
+
+variable "enable_utility_vm" {
+  type        = bool
+  default     = false
+  description = "If true, an additional EC2 instance will be created for running utilities, such as benchmarks or other scripts"
+}
+
+variable "utility_vm" {
+  type = object({
+    instance_type = string
+    disk_size_gb  = number
+    disk_type     = string
+  })
+
+  default = {
+    instance_type = "t3.xlarge"
+    disk_type     = "gp3"
+    disk_size_gb  = 50
+  }
+
+  description = "Configuration of the utility EC2 instance"
+}

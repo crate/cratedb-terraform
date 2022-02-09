@@ -83,3 +83,8 @@ Please note that it might take a couple of minutes before instances are fully pr
 Your EC2 instances will only have a public IP address if the corresponding VPC subnet is configured to [auto-assign](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html) public IP addresses.
 
 Connecting via SSH can be done using the `ec2-user` account and the configured key pair. In the default configuration, SSH access is enabled in the security group. It can be disabled if needed via the `ssh_access` variable.
+
+## Utility EC2 instance
+Optionally, you can provision an additional EC2 instance that will not run CrateDB. Instead, it can be used to run benchmarks or other client applications. It is located in the same VPC and subnet as the CrateDB nodes for optimal network latency.
+
+Connect to the EC2 instance using the `ec2-user` account and the configured key pair. The host and port for SSH connections is available via the output variables `utility_vm_host` and `utility_vm_port`.
