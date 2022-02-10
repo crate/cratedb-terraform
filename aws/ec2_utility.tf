@@ -5,7 +5,7 @@ locals {
 }
 
 data "template_file" "utilities_provisioning" {
-  template = file("${path.module}/scripts/cloud-init-utilities.tpl")
+  template = file("${path.module}/scripts/cloud-init-utilities.tftpl")
 }
 
 data "template_cloudinit_config" "config_utilities" {

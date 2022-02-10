@@ -35,8 +35,9 @@ data "cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content = templatefile("${path.module}/scripts/cloud-init-cratedb.tftpl",
+    content = templatefile("${path.module}/scripts/cloud-init-cratedb-${var.cratedb_tar_download_url == "" ? "rpm" : "tar"}.tftpl",
       {
+        crate_download_url    = var.cratedb_tar_download_url
         crate_user            = local.config.crate_username
         crate_pass            = random_password.cratedb_password.result
         crate_heap_size       = var.crate.heap_size_gb
