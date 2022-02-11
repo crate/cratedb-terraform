@@ -7,8 +7,8 @@ terraform {
       version = "~> 4.0"
     }
 
-    template = {
-      source  = "template"
+    cloudinit = {
+      source  = "cloudinit"
       version = "~> 2.2"
     }
 
