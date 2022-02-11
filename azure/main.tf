@@ -12,8 +12,8 @@ terraform {
       version = "~> 3.1"
     }
 
-    template = {
-      source  = "template"
+    cloudinit = {
+      source  = "cloudinit"
       version = "~> 2.2"
     }
 

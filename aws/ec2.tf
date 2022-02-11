@@ -27,31 +27,27 @@ resource "tls_self_signed_cert" "ssl" {
   ]
 }
 
-# Cloud Init script for initializing CrateDB
-data "template_file" "crate_provisioning" {
-  template = file("${path.module}/scripts/cloud-init-cratedb.tpl")
-
-  vars = {
-    crate_user            = local.config.crate_username
-    crate_pass            = random_password.cratedb_password.result
-    crate_heap_size       = var.crate.heap_size_gb
-    crate_cluster_name    = var.crate.cluster_name
-    crate_cluster_size    = var.crate.cluster_size
-    crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
-    crate_ssl_enable      = var.crate.ssl_enable
-    crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
-    crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
-  }
-}
-
-data "template_cloudinit_config" "config" {
+data "cloudinit_config" "config" {
   gzip          = true
   base64_encode = true
 
+  # Cloud Init script for initializing CrateDB
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = data.template_file.crate_provisioning.rendered
+    content = templatefile("${path.module}/scripts/cloud-init-cratedb.tftpl",
+      {
+        crate_user            = local.config.crate_username
+        crate_pass            = random_password.cratedb_password.result
+        crate_heap_size       = var.crate.heap_size_gb
+        crate_cluster_name    = var.crate.cluster_name
+        crate_cluster_size    = var.crate.cluster_size
+        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
+        crate_ssl_enable      = var.crate.ssl_enable
+        crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
+        crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
+      }
+    )
   }
 }
 
@@ -137,7 +133,7 @@ resource "aws_instance" "cratedb_node" {
   instance_type     = var.instance_type
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
-  user_data         = data.template_cloudinit_config.config.rendered
+  user_data         = data.cloudinit_config.config.rendered
 
   network_interface {
     network_interface_id = element(aws_network_interface.interface.*.id, count.index)
