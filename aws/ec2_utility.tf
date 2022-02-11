@@ -4,18 +4,14 @@ locals {
   ssh_alternative_port = 2222
 }
 
-data "template_file" "utilities_provisioning" {
-  template = file("${path.module}/scripts/cloud-init-utilities.tftpl")
-}
-
-data "template_cloudinit_config" "config_utilities" {
+data "cloudinit_config" "config_utilities" {
   gzip          = true
   base64_encode = true
 
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = data.template_file.utilities_provisioning.rendered
+    content      = templatefile("${path.module}/scripts/cloud-init-utilities.tftpl", {})
   }
 }
 
@@ -61,7 +57,7 @@ resource "aws_instance" "utilities" {
   instance_type     = var.utility_vm.instance_type
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
-  user_data         = data.template_cloudinit_config.config_utilities.rendered
+  user_data         = data.cloudinit_config.config_utilities.rendered
 
   network_interface {
     network_interface_id = element(aws_network_interface.utilities_interface.*.id, count.index)
