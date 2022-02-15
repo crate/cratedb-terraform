@@ -11,7 +11,13 @@ data "cloudinit_config" "config_utilities" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/scripts/cloud-init-utilities.tftpl", {})
+    content = templatefile("${path.module}/scripts/cloud-init-utilities.tftpl",
+      {
+        crate_host : aws_lb.loadbalancer.dns_name,
+        crate_user : local.config.crate_username,
+        crate_password : random_password.cratedb_password.result
+      }
+    )
   }
 }
 
