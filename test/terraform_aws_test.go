@@ -4,12 +4,18 @@ import (
 	"testing"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/stretchr/testify/assert"
 	"fmt"
 	"os"
 )
 
 func TestTerraformAws(t *testing.T) {
+	environment.RequireEnvVar(t, "AWS_TEST_VPC_ID")
+	environment.RequireEnvVar(t, "AWS_TEST_SSH_KEYPAIR")
+	environment.RequireEnvVar(t, "AWS_TEST_SUBNET_IDS")
+	environment.RequireEnvVar(t, "AWS_TEST_AVAILABILITY_ZONES")
+
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../aws",
 		Vars: map[string]interface{}{

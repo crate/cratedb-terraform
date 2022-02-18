@@ -4,12 +4,15 @@ import (
 	"testing"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/stretchr/testify/assert"
 	"fmt"
 	"os"
 )
 
 func TestTerraformAzure(t *testing.T) {
+	environment.RequireEnvVar(t, "AZURE_TEST_SUBSCRIPTION_ID")
+
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../azure",
 		Vars: map[string]interface{}{
