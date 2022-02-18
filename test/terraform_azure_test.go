@@ -35,10 +35,9 @@ func TestTerraformAzure(t *testing.T) {
 	assert.Regexp(t, "https.*$", clusterUrlIp)
 
 	// DNS resolution takes too long to propagate, hence we use the IP here instead
-	body, err := RunCrateDBQuery(clusterUrlIp, cratedbUsername, cratedbPassword)
-	if assert.NoError(t, err) {
-		assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
-		assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
-		assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
-	}
+	body := RunCrateDBQuery(t, clusterUrlIp, cratedbUsername, cratedbPassword)
+
+	assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
+	assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
+	assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
 }

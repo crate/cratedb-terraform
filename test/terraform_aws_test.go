@@ -38,10 +38,9 @@ func TestTerraformAws(t *testing.T) {
 	// we don't validate the certificate explicitly, but check that the URL includes https
 	assert.Regexp(t, "https.*$", clusterUrl)
 
-	body, err := RunCrateDBQuery(clusterUrl, cratedbUsername, cratedbPassword)
-	if assert.NoError(t, err) {
-		assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
-		assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
-		assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
-	}
+	body := RunCrateDBQuery(t, clusterUrl, cratedbUsername, cratedbPassword)
+
+	assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
+	assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
+	assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
 }
