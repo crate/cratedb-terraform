@@ -40,7 +40,7 @@ variable "cratedb_tar_download_url" {
   default     = null
   validation {
     condition     = var.cratedb_tar_download_url == null || can(regex("^https://cdn.crate.io/.*\\.tar\\.gz$", var.cratedb_tar_download_url))
-    error_message = "The CrateDB tar.gz download URL must point to a http://cdn.crate.io address."
+    error_message = "The CrateDB tar.gz download URL must point to a https://cdn.crate.io address."
   }
 }
 
