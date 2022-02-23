@@ -113,6 +113,11 @@ data "aws_ami" "amazon_linux" {
     values = ["amzn2-ami-hvm*"]
   }
 
+  filter {
+    name   = "architecture"
+    values = [var.instance_architecture]
+  }
+
   owners = ["amazon"]
 }
 

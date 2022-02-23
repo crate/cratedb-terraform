@@ -81,6 +81,12 @@ variable "instance_type" {
   description = "The EC2 instance type to use for nodes"
 }
 
+variable "instance_architecture" {
+  type        = string
+  default     = "amd64"
+  description = "The hardware architecture of the EC2 instance, e.g. amd64 or arm64. Must match with the selected instance_type."
+}
+
 variable "ssh_keypair" {
   type        = string
   description = "The name of an existing EC2 key pair"
@@ -110,15 +116,17 @@ variable "enable_utility_vm" {
 
 variable "utility_vm" {
   type = object({
-    instance_type = string
-    disk_size_gb  = number
-    disk_type     = string
+    instance_type         = string
+    instance_architecture = string
+    disk_size_gb          = number
+    disk_type             = string
   })
 
   default = {
-    instance_type = "t3.xlarge"
-    disk_type     = "gp3"
-    disk_size_gb  = 50
+    instance_type         = "t3.xlarge"
+    instance_architecture = "amd64"
+    disk_type             = "gp3"
+    disk_size_gb          = 50
   }
 
   description = "Configuration of the utility EC2 instance"

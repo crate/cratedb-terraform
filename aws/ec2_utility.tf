@@ -56,10 +56,27 @@ resource "aws_network_interface" "utilities_interface" {
   }
 }
 
+# Not reusing the AMI from CrateDB nodes, as the architecture can differ (amd64 vs arm64)
+data "aws_ami" "amazon_linux_utilities" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.utility_vm.instance_architecture]
+  }
+
+  owners = ["amazon"]
+}
+
 resource "aws_instance" "utilities" {
   count = var.enable_utility_vm ? 1 : 0
 
-  ami               = data.aws_ami.amazon_linux.id
+  ami               = data.aws_ami.amazon_linux_utilities.id
   instance_type     = var.utility_vm.instance_type
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
