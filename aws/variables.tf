@@ -125,13 +125,11 @@ variable "utility_vm" {
     instance_type         = string
     instance_architecture = string
     disk_size_gb          = number
-    disk_type             = string
   })
 
   default = {
     instance_type         = "t3.xlarge"
     instance_architecture = "amd64"
-    disk_type             = "gp3"
     disk_size_gb          = 50
   }
 

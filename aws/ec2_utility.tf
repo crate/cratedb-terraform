@@ -88,13 +88,7 @@ resource "aws_instance" "utilities" {
   }
 
   root_block_device {
-    volume_size = 50
-  }
-
-  ebs_block_device {
-    device_name = "/dev/sdh"
     volume_size = var.utility_vm.disk_size_gb
-    volume_type = var.utility_vm.disk_type
   }
 
   lifecycle {

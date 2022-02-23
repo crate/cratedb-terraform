@@ -9,14 +9,6 @@ packages:
   - tmux
   - htop
 
-bootcmd:
-  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
-  - mkdir -m 777 /opt/data
-  - mount LABEL=data /opt/data
-
-mounts:
-  - ["LABEL=data", "/opt/data", "xfs", "defaults,noexec,nofail"]
-
 write_files:
   - content: |
       #!/bin/bash
