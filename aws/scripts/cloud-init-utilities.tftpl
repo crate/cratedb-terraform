@@ -13,10 +13,17 @@ write_files:
   - content: |
       #!/bin/bash
 
+      # Ensure ec2-user is already present
+      until [[ $(getent passwd ec2-user) ]]
+      do
+          sleep 5
+      done
+
       sudo -i -u ec2-user bash << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
         source ~/.bashrc
 
+        nvm install-latest-npm
         nvm install node
 
         git clone https://github.com/hammerhead/nodeIngestBench.git
@@ -32,10 +39,9 @@ write_files:
       CRATE_HOST="${crate_host}"
       CRATE_PASSWORD="${crate_password}"
       CRATE_SSL="true"
-    owner: ec2-user:ec2-user
-    path: /home/ec2-user/.env
-    permissions: "0660"
+    path: /root/.env
 
-commands:
+runcmd:
   - /root/node.sh
-  - mv /home/ec2-user/.env /home/ec2-user/nodeIngestBench/.env
+  - mv /root/.env /home/ec2-user/nodeIngestBench/.env
+  - chown ec2-user:ec2-user /home/ec2-user/nodeIngestBench/.env
