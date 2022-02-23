@@ -1,6 +1,6 @@
 resource "aws_lb" "loadbalancer" {
   name                             = "${local.config.component_name}-lb"
-  internal                         = false
+  internal                         = var.load_balancer_internal
   load_balancer_type               = "network"
   subnets                          = var.subnet_ids
   enable_cross_zone_load_balancing = true

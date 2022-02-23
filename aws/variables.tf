@@ -114,6 +114,12 @@ variable "enable_utility_vm" {
   description = "If true, an additional EC2 instance will be created for running utilities, such as benchmarks or other scripts"
 }
 
+variable "load_balancer_internal" {
+  type        = bool
+  default     = false
+  description = "If true, the load balancer's URL will resolve to a private IP address, only reachable from within the VPC"
+}
+
 variable "utility_vm" {
   type = object({
     instance_type         = string
