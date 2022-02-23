@@ -37,7 +37,11 @@ variable "crate" {
 variable "cratedb_tar_download_url" {
   type        = string
   description = "If specified, a tar.gz archive will be retrieve from the specified download URL instead of using the RPM package to install CrateDB"
-  default     = ""
+  default     = null
+  validation {
+    condition     = var.cratedb_tar_download_url == null || can(regex("^https://cdn.crate.io/.*\\.tar\\.gz$", var.cratedb_tar_download_url))
+    error_message = "The CrateDB tar.gz download URL must point to a http://cdn.crate.io address."
+  }
 }
 
 variable "disk_size_gb" {
@@ -85,6 +89,10 @@ variable "instance_architecture" {
   type        = string
   default     = "amd64"
   description = "The hardware architecture of the EC2 instance, e.g. amd64 or arm64. Must match with the selected instance_type."
+  validation {
+    condition     = contains(["amd64", "arm64"], var.instance_architecture)
+    error_message = "Unsupported architecture. Must be amd64 or arm64."
+  }
 }
 
 variable "ssh_keypair" {
