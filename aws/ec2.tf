@@ -140,6 +140,7 @@ resource "aws_instance" "cratedb_node" {
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
   user_data         = data.cloudinit_config.config.rendered
+  monitoring        = var.enable_utility_vm
 
   network_interface {
     network_interface_id = element(aws_network_interface.interface.*.id, count.index)

@@ -6,6 +6,8 @@ package_reboot_if_required: true
 
 packages:
   - git
+  - tmux
+  - htop
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
