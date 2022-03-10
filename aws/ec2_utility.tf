@@ -1,5 +1,5 @@
 # Depending on if the first subnet is a public one or not, the EC2 instance might
-# not be able to get a public IP address. Hence, we also attach it to the load balancer
+# not be able to get a public IP address. Hence, we also attach it to the load balancer.
 locals {
   ssh_alternative_port = 2222
 }
