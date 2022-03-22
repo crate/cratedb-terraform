@@ -4,12 +4,18 @@ import (
 	"testing"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/stretchr/testify/assert"
 	"fmt"
 	"os"
 )
 
 func TestTerraformAws(t *testing.T) {
+	environment.RequireEnvVar(t, "AWS_TEST_VPC_ID")
+	environment.RequireEnvVar(t, "AWS_TEST_SSH_KEYPAIR")
+	environment.RequireEnvVar(t, "AWS_TEST_SUBNET_IDS")
+	environment.RequireEnvVar(t, "AWS_TEST_AVAILABILITY_ZONES")
+
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../aws",
 		Vars: map[string]interface{}{
@@ -32,10 +38,9 @@ func TestTerraformAws(t *testing.T) {
 	// we don't validate the certificate explicitly, but check that the URL includes https
 	assert.Regexp(t, "https.*$", clusterUrl)
 
-	body, err := RunCrateDBQuery(clusterUrl, cratedbUsername, cratedbPassword)
-	if assert.NoError(t, err) {
-		assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
-		assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
-		assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
-	}
+	body := RunCrateDBQuery(t, clusterUrl, cratedbUsername, cratedbPassword)
+
+	assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
+	assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
+	assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
 }

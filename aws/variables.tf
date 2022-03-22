@@ -34,6 +34,16 @@ variable "crate" {
   description = "CrateDB application configuration"
 }
 
+variable "cratedb_tar_download_url" {
+  type        = string
+  description = "If specified, a tar.gz archive will be retrieve from the specified download URL instead of using the RPM package to install CrateDB"
+  default     = null
+  validation {
+    condition     = var.cratedb_tar_download_url == null || can(regex("^https://cdn.crate.io/.*\\.tar\\.gz$", var.cratedb_tar_download_url))
+    error_message = "The CrateDB tar.gz download URL must point to a https://cdn.crate.io address."
+  }
+}
+
 variable "disk_size_gb" {
   type        = number
   description = "The disk size in GB to use for CrateDB's data directory"
@@ -75,6 +85,16 @@ variable "instance_type" {
   description = "The EC2 instance type to use for nodes"
 }
 
+variable "instance_architecture" {
+  type        = string
+  default     = "amd64"
+  description = "The hardware architecture of the EC2 instance, e.g. amd64 or arm64. Must match with the selected instance_type."
+  validation {
+    condition     = contains(["amd64", "arm64"], var.instance_architecture)
+    error_message = "Unsupported architecture. Must be amd64 or arm64."
+  }
+}
+
 variable "ssh_keypair" {
   type        = string
   description = "The name of an existing EC2 key pair"
@@ -94,4 +114,32 @@ variable "ssh_access" {
   type        = bool
   default     = true
   description = "Set to true, if inbound SSH access to EC2 instances should be allowed. Otherwise, set to false."
+}
+
+variable "enable_utility_vm" {
+  type        = bool
+  default     = false
+  description = "If true, an additional EC2 instance will be created for running utilities, such as benchmarks or other scripts"
+}
+
+variable "load_balancer_internal" {
+  type        = bool
+  default     = false
+  description = "If true, the load balancer's URL will resolve to a private IP address, only reachable from within the VPC"
+}
+
+variable "utility_vm" {
+  type = object({
+    instance_type         = string
+    instance_architecture = string
+    disk_size_gb          = number
+  })
+
+  default = {
+    instance_type         = "t3.xlarge"
+    instance_architecture = "amd64"
+    disk_size_gb          = 50
+  }
+
+  description = "Configuration of the utility EC2 instance"
 }

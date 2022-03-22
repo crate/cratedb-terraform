@@ -4,12 +4,15 @@ import (
 	"testing"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/stretchr/testify/assert"
 	"fmt"
 	"os"
 )
 
 func TestTerraformAzure(t *testing.T) {
+	environment.RequireEnvVar(t, "AZURE_TEST_SUBSCRIPTION_ID")
+
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../azure",
 		Vars: map[string]interface{}{
@@ -32,10 +35,9 @@ func TestTerraformAzure(t *testing.T) {
 	assert.Regexp(t, "https.*$", clusterUrlIp)
 
 	// DNS resolution takes too long to propagate, hence we use the IP here instead
-	body, err := RunCrateDBQuery(clusterUrlIp, cratedbUsername, cratedbPassword)
-	if assert.NoError(t, err) {
-		assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
-		assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
-		assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
-	}
+	body := RunCrateDBQuery(t, clusterUrlIp, cratedbUsername, cratedbPassword)
+
+	assert.Equal(t, "[nodes]", fmt.Sprintf("%v", body["cols"]))
+	assert.Equal(t, "[[2]]", fmt.Sprintf("%v", body["rows"]))
+	assert.Equal(t, "1", fmt.Sprintf("%v", body["rowcount"]))
 }

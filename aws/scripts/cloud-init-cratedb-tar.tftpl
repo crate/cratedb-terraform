@@ -1,0 +1,177 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+packages:
+  - wget
+  - openssl
+  - htop
+
+bootcmd:
+  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
+  - mkdir -m 777 /opt/data
+  - mount LABEL=data /opt/data
+
+mounts:
+  - ["LABEL=data", "/opt/data", "xfs", "defaults,noexec,nofail"]
+
+write_files:
+  - content: !!binary |
+      ${crate_ssl_private_key}
+    path: /opt/crate/config/private_key.pem
+    permissions: "0660"
+  - content: !!binary |
+      ${crate_ssl_certificate}
+    path: /opt/crate/config/certificate.pem
+    permissions: "0660"
+  - content: |
+      #!/bin/bash
+
+      sleep 30
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
+    owner: root:root
+    path: /opt/deployment/finish.sh
+    permissions: "0755"
+  - content: |
+        path.data: /opt/data
+
+        auth.host_based.enabled: true
+        auth:
+          host_based:
+            config:
+              0:
+                user: crate
+                address: _local_
+                method: trust
+              99:
+                method: password
+
+        network.host: _site_, _local_
+
+        discovery.seed_hosts:
+            ${crate_nodes_ips}
+
+        cluster.name: ${crate_cluster_name}
+        cluster.initial_master_nodes:
+            ${crate_nodes_ips}
+
+        gateway.expected_data_nodes: ${crate_cluster_size}
+        gateway.recover_after_data_nodes: ${crate_cluster_size}
+
+        ssl.http.enabled: ${crate_ssl_enable ? "true" : "false"}
+        ssl.psql.enabled: ${crate_ssl_enable ? "true" : "false"}
+        ssl.keystore_filepath: /opt/crate/config/keystore.p12
+        ssl.keystore_password: changeit
+        ssl.keystore_key_password: changeit
+    owner: root:root
+    path: /opt/crate/config/crate.yml
+    permissions: "0755"
+  - content: |
+      vm.max_map_count=262144
+    owner: root:root
+    path: /etc/sysctl.d/crate.conf
+    permissions: "0755"
+  - content: |
+      # Maximum locked memory size. Set to "unlimited" if you use the
+      # bootstrap.mlockall option in crate.yml. You must also set
+      # CRATE_HEAP_SIZE.
+      MAX_LOCKED_MEMORY=unlimited
+
+      # Recommended memory settings for production:
+      # - assign half of the OS memory to CrateDB
+      #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
+      # - disable swapping my setting bootstrap.mlockall in crate.yml
+      # Heap Size (defaults to 256m min, 1g max)
+      CRATE_HEAP_SIZE=${crate_heap_size}g
+
+      # Additional Java OPTS
+      # CRATE_JAVA_OPTS=
+
+      # Force the JVM to use IPv4 stack
+      CRATE_USE_IPV4=true
+    owner: root:root
+    path: /etc/sysconfig/crate
+    permissions: "0755"
+  - content: |
+      [Unit]
+      Description=CrateDB Server
+      Documentation=https://crate.io/docs
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=crate
+      Group=crate
+      WorkingDirectory=/opt/crate
+
+      # default environment variables
+      Environment="CRATE_HOME=/opt/crate"
+      # load environment
+      EnvironmentFile=-/etc/sysconfig/crate
+
+      ExecStart=/opt/crate/bin/crate
+
+      StandardOutput=journal
+      StandardError=journal
+
+      # Disable timeout logic and wait until process is stopped
+      TimeoutStopSec=0
+
+      # SIGTERM signal is used to stop the Java process
+      KillSignal=SIGTERM
+
+      # Send the signal only to the JVM rather than its control group
+      KillMode=process
+
+      # Java process is never killed
+      SendSIGKILL=no
+
+      # When a JVM receives a SIGTERM signal it exits with code 143
+      SuccessExitStatus=143 SIGTERM SIGKILL
+
+      # Override these settings with a file called
+      # /etc/systemd/system/crate.service.d/crate.conf and specify any changes
+
+      # Specifies the maximum number of bytes of memory that may be locked into RAM
+      LimitMEMLOCK=infinity
+
+      # Specifies the maximum file descriptor number that can be opened by this process
+      LimitNOFILE=65536
+
+      # Specifies the maximum number of processes
+      LimitNPROC=4096
+
+      # Specifies the maximum file size
+      LimitFSIZE=infinity
+
+      # Specifies limit of virtual memory that can be used
+      LimitAS=infinity
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root:root
+    path: /usr/lib/systemd/system/crate.service
+    permissions: "0444"
+
+runcmd:
+  - groupadd -r crate
+  - useradd -r -g crate -d /opt/crate -s /sbin/nologin -c "Dude, it's a storage!" crate
+  - chown -R crate:crate /opt/data
+  - chmod 700 /opt/data
+  - openssl pkcs12 -export -in /opt/crate/config/certificate.pem -inkey /opt/crate/config/private_key.pem -certfile /opt/crate/config/certificate.pem -out /opt/crate/config/keystore.p12 -passout pass:changeit
+  - rm /opt/crate/config/certificate.pem && rm /opt/crate/config/private_key.pem
+  - wget --no-verbose ${crate_download_url}
+  - tar -xf crate-*.tar.gz
+  - mv -n crate-*/* /opt/crate
+  - mv crate-*/config/log4j2.properties /opt/crate/config
+  - chown -R crate:crate /opt/crate
+  - sysctl -w vm.max_map_count=262144
+  - systemctl daemon-reload
+  - systemctl enable crate
+  - systemctl start crate
+  - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
+
+final_message: "The system is finally up, after $UPTIME seconds"

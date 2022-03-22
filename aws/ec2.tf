@@ -35,8 +35,9 @@ data "cloudinit_config" "config" {
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content = templatefile("${path.module}/scripts/cloud-init-cratedb.tftpl",
+    content = templatefile("${path.module}/scripts/cloud-init-cratedb-${var.cratedb_tar_download_url == null ? "rpm" : "tar"}.tftpl",
       {
+        crate_download_url    = var.cratedb_tar_download_url
         crate_user            = local.config.crate_username
         crate_pass            = random_password.cratedb_password.result
         crate_heap_size       = var.crate.heap_size_gb
@@ -83,6 +84,15 @@ resource "aws_security_group" "cratedb" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+  ingress {
+    description      = "SSH"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = var.ssh_access ? ["0.0.0.0/0"] : []
+    ipv6_cidr_blocks = var.ssh_access ? ["::/0"] : []
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -92,24 +102,17 @@ resource "aws_security_group" "cratedb" {
   }
 }
 
-resource "aws_security_group_rule" "ssh" {
-  count = var.ssh_access ? 1 : 0
-
-  security_group_id = aws_security_group.cratedb.id
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
-
 data "aws_ami" "amazon_linux" {
   most_recent = true
 
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.instance_architecture]
   }
 
   owners = ["amazon"]
@@ -134,6 +137,7 @@ resource "aws_instance" "cratedb_node" {
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
   user_data         = data.cloudinit_config.config.rendered
+  monitoring        = var.enable_utility_vm
 
   network_interface {
     network_interface_id = element(aws_network_interface.interface.*.id, count.index)

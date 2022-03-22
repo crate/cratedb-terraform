@@ -13,3 +13,13 @@ output "cratedb_password" {
   sensitive   = true
   description = "The password to authenticate against CrateDB"
 }
+
+output "utility_vm_host" {
+  value       = aws_lb.loadbalancer.dns_name
+  description = "If enabled, the utility VM can be reached using this hostname"
+}
+
+output "utility_vm_port" {
+  value       = local.ssh_alternative_port
+  description = "If enabled, the utility VM can be reached using this port"
+}
