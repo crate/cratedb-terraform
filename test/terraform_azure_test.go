@@ -22,7 +22,7 @@ func TestTerraformAzure(t *testing.T) {
 		Vars: map[string]interface{}{
 			"subscription_id": os.Getenv("AZURE_TEST_SUBSCRIPTION_ID"),
 			"crate": "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
-			"config": fmt.Sprintf("{project_name = \"a%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", projectName),
+			"config": fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", projectName),
 		},
 	})
 
