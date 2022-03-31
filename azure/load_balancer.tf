@@ -23,7 +23,6 @@ resource "azurerm_lb_backend_address_pool" "main" {
 }
 
 resource "azurerm_lb_probe" "http" {
-  resource_group_name = azurerm_resource_group.rg.name
   loadbalancer_id     = azurerm_lb.main.id
   name                = "crate-http-running-probe"
   port                = 4200
@@ -33,7 +32,6 @@ resource "azurerm_lb_probe" "http" {
 }
 
 resource "azurerm_lb_probe" "postgresql" {
-  resource_group_name = azurerm_resource_group.rg.name
   loadbalancer_id     = azurerm_lb.main.id
   name                = "crate-postgresql-running-probe"
   port                = 4200
@@ -43,7 +41,6 @@ resource "azurerm_lb_probe" "postgresql" {
 }
 
 resource "azurerm_lb_rule" "cratedb_http" {
-  resource_group_name            = azurerm_resource_group.rg.name
   loadbalancer_id                = azurerm_lb.main.id
   name                           = "LB-CrateDB-Rule"
   protocol                       = "Tcp"
@@ -55,7 +52,6 @@ resource "azurerm_lb_rule" "cratedb_http" {
 }
 
 resource "azurerm_lb_rule" "cratedb_postgresql" {
-  resource_group_name            = azurerm_resource_group.rg.name
   loadbalancer_id                = azurerm_lb.main.id
   name                           = "LB-PostgreSQL-Rule"
   protocol                       = "Tcp"
