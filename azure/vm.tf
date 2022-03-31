@@ -60,7 +60,7 @@ resource "azurerm_network_interface" "crate" {
   ip_configuration {
     name                          = "default"
     subnet_id                     = azurerm_subnet.sn.id
-    private_ip_address_allocation = "dynamic"
+    private_ip_address_allocation = "Dynamic"
   }
 }
 

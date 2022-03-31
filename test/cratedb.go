@@ -6,6 +6,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/stretchr/testify/assert"
 	"fmt"
+	"time"
 	"crypto/tls"
 	"encoding/base64"
 )
@@ -26,7 +27,7 @@ func RunCrateDBQuery(t testing.TestingT, clusterUrl string, username string, pas
 		requestHeaders,
 		200, // expected status code
 		20, // retries
-		5, // sleep between retries
+		time.Second * 5, // sleep between retries
 		&tls.Config{InsecureSkipVerify: true},
 	)
 
