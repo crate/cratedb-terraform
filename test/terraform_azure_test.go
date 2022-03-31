@@ -13,12 +13,16 @@ import (
 func TestTerraformAzure(t *testing.T) {
 	environment.RequireEnvVar(t, "AZURE_TEST_SUBSCRIPTION_ID")
 
+	// UniqueId() can return an ID starting with a digit, but Azure requires a
+	// letter as the first character, so we always prepend one.
+	projectName := fmt.Sprintf("a%s", random.UniqueId())
+
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../azure",
 		Vars: map[string]interface{}{
 			"subscription_id": os.Getenv("AZURE_TEST_SUBSCRIPTION_ID"),
 			"crate": "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
-			"config": fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", random.UniqueId()),
+			"config": fmt.Sprintf("{project_name = \"a%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", projectName),
 		},
 	})
 
