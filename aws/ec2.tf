@@ -10,7 +10,6 @@ resource "tls_private_key" "ssl" {
 }
 
 resource "tls_self_signed_cert" "ssl" {
-  key_algorithm   = "RSA"
   private_key_pem = tls_private_key.ssl.private_key_pem
 
   # Set to two years. If the number is too high, there appears to be an overflow resulting in a date in the past
