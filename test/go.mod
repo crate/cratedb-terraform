@@ -3,7 +3,7 @@ module github.com/crate/crate-terraform
 go 1.18
 
 require (
-	github.com/gruntwork-io/terratest v0.40.8
+	github.com/gruntwork-io/terratest v0.40.12
 	github.com/stretchr/testify v1.7.1
 )
 
