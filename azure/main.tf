@@ -9,7 +9,7 @@ terraform {
 
     random = {
       source  = "random"
-      version = "~> 3.2"
+      version = "~> 3.3"
     }
 
     cloudinit = {
