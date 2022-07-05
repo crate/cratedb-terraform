@@ -87,11 +87,11 @@ variable "instance_type" {
 
 variable "instance_architecture" {
   type        = string
-  default     = "amd64"
-  description = "The hardware architecture of the EC2 instance, e.g. amd64 or arm64. Must match with the selected instance_type."
+  default     = "x86_64"
+  description = "The hardware architecture of the EC2 instance, e.g. x86_64 or arm64. Must match with the selected instance_type."
   validation {
-    condition     = contains(["amd64", "arm64"], var.instance_architecture)
-    error_message = "Unsupported architecture. Must be amd64 or arm64."
+    condition     = contains(["x86_64", "arm64"], var.instance_architecture)
+    error_message = "Unsupported architecture. Must be x86_64 or arm64."
   }
 }
 
@@ -137,7 +137,7 @@ variable "utility_vm" {
 
   default = {
     instance_type         = "t3.xlarge"
-    instance_architecture = "amd64"
+    instance_architecture = "x86_64"
     disk_size_gb          = 50
   }
 
