@@ -11,6 +11,7 @@ import (
 )
 
 func TestTerraformAws(t *testing.T) {
+	environment.RequireEnvVar(t, "AWS_TEST_REGION")
 	environment.RequireEnvVar(t, "AWS_TEST_VPC_ID")
 	environment.RequireEnvVar(t, "AWS_TEST_SSH_KEYPAIR")
 	environment.RequireEnvVar(t, "AWS_TEST_SUBNET_IDS")
@@ -19,6 +20,7 @@ func TestTerraformAws(t *testing.T) {
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../aws",
 		Vars: map[string]interface{}{
+			"region": os.Getenv("AWS_TEST_REGION"),
 			"vpc_id": os.Getenv("AWS_TEST_VPC_ID"),
 			"ssh_keypair": os.Getenv("AWS_TEST_SSH_KEYPAIR"),
 			"subnet_ids": os.Getenv("AWS_TEST_SUBNET_IDS"),
