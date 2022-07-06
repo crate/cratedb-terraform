@@ -17,6 +17,7 @@ Integration testing is done using [Terratest](https://terratest.gruntwork.io). T
 Since the tests need details on the cloud environment to run in, set up corresponding environment variables, e.g. in a `.env` file:
 
 ```shell
+AWS_TEST_REGION=eu-central-1
 AWS_TEST_VPC_ID=vpc-123
 AWS_TEST_SSH_KEYPAIR=cratedb_terraform
 AWS_TEST_SUBNET_IDS="[\"subnet-123\", \"subnet-124\"]"
@@ -29,6 +30,7 @@ To run the test, load the environment variables and pass them to `go test` (see 
 ```shell
 cd test
 source .env
+AWS_TEST_REGION=$AWS_TEST_REGION \
 AWS_TEST_VPC_ID=$AWS_TEST_VPC_ID \
 AWS_TEST_SSH_KEYPAIR=$AWS_TEST_SSH_KEYPAIR \
 AWS_TEST_SUBNET_IDS=$AWS_TEST_SUBNET_IDS \
