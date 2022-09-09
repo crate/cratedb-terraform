@@ -1,13 +1,13 @@
 package test
 
 import (
-	"testing"
-	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/gruntwork-io/terratest/modules/random"
-	"github.com/gruntwork-io/terratest/modules/environment"
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"github.com/gruntwork-io/terratest/modules/environment"
+	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 	"os"
+	"testing"
 )
 
 func TestTerraformAzure(t *testing.T) {
@@ -21,8 +21,8 @@ func TestTerraformAzure(t *testing.T) {
 		TerraformDir: "../azure",
 		Vars: map[string]interface{}{
 			"subscription_id": os.Getenv("AZURE_TEST_SUBSCRIPTION_ID"),
-			"crate": "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
-			"config": fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", projectName),
+			"crate":           "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
+			"config":          fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\", location = \"westeurope\"}", projectName),
 		},
 	})
 
