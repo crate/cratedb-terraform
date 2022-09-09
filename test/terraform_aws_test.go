@@ -1,13 +1,13 @@
 package test
 
 import (
-	"testing"
-	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/gruntwork-io/terratest/modules/random"
-	"github.com/gruntwork-io/terratest/modules/environment"
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"github.com/gruntwork-io/terratest/modules/environment"
+	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 	"os"
+	"testing"
 )
 
 func TestTerraformAws(t *testing.T) {
@@ -20,13 +20,13 @@ func TestTerraformAws(t *testing.T) {
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../aws",
 		Vars: map[string]interface{}{
-			"region": os.Getenv("AWS_TEST_REGION"),
-			"vpc_id": os.Getenv("AWS_TEST_VPC_ID"),
-			"ssh_keypair": os.Getenv("AWS_TEST_SSH_KEYPAIR"),
-			"subnet_ids": os.Getenv("AWS_TEST_SUBNET_IDS"),
+			"region":             os.Getenv("AWS_TEST_REGION"),
+			"vpc_id":             os.Getenv("AWS_TEST_VPC_ID"),
+			"ssh_keypair":        os.Getenv("AWS_TEST_SSH_KEYPAIR"),
+			"subnet_ids":         os.Getenv("AWS_TEST_SUBNET_IDS"),
 			"availability_zones": os.Getenv("AWS_TEST_AVAILABILITY_ZONES"),
-			"config": fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\"}", random.UniqueId()),
-			"crate": "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
+			"config":             fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\"}", random.UniqueId()),
+			"crate":              "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
 		},
 	})
 
