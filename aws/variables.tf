@@ -95,6 +95,12 @@ variable "instance_architecture" {
   }
 }
 
+variable "instance_profile" {
+  type        = string
+  default     = null
+  description = "An optional EC2 instance profile to assign to CrateDB nodes"
+}
+
 variable "ssh_keypair" {
   type        = string
   description = "The name of an existing EC2 key pair"
