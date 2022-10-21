@@ -83,10 +83,7 @@ write_files:
       CRATE_HEAP_SIZE=${crate_heap_size}g
 
       # Additional Java OPTS
-      # CRATE_JAVA_OPTS=
-
-      # Force the JVM to use IPv4 stack
-      CRATE_USE_IPV4=true
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.0.0.jar=8080"
     owner: root:root
     path: /etc/sysconfig/crate
     permissions: "0755"
@@ -99,6 +96,7 @@ runcmd:
   - yum install -y crate
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
+  - wget -P /opt/crate https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh

@@ -84,6 +84,15 @@ resource "aws_security_group" "cratedb" {
   }
 
   ingress {
+    description      = "CrateDB-JMX"
+    from_port        = 8080
+    to_port          = 8080
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
     description      = "SSH"
     from_port        = 22
     to_port          = 22
@@ -176,5 +185,12 @@ resource "aws_lb_target_group_attachment" "postgresql" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.postgresql.arn
+  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+}
+
+resource "aws_lb_target_group_attachment" "jmx" {
+  count = var.crate.cluster_size
+
+  target_group_arn = aws_lb_target_group.jmx.arn
   target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
 }
