@@ -1,3 +1,7 @@
+locals {
+  cratedb_password = var.cratedb_password == null ? random_password.cratedb_password.result : var.cratedb_password
+}
+
 resource "random_password" "cratedb_password" {
   length           = 16
   special          = true
@@ -38,7 +42,7 @@ data "cloudinit_config" "config" {
       {
         crate_download_url    = var.cratedb_tar_download_url
         crate_user            = local.config.crate_username
-        crate_pass            = random_password.cratedb_password.result
+        crate_pass            = local.cratedb_password
         crate_heap_size       = var.crate.heap_size_gb
         crate_cluster_name    = var.crate.cluster_name
         crate_cluster_size    = var.crate.cluster_size

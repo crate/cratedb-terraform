@@ -9,7 +9,7 @@ output "cratedb_username" {
 }
 
 output "cratedb_password" {
-  value       = random_password.cratedb_password.result
+  value       = local.cratedb_password
   sensitive   = true
   description = "The password to authenticate against CrateDB"
 }

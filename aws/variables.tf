@@ -34,6 +34,13 @@ variable "crate" {
   description = "CrateDB application configuration"
 }
 
+variable "cratedb_password" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "The password to use for the CrateDB database user. If null, a random password will be assigned."
+}
+
 variable "cratedb_tar_download_url" {
   type        = string
   description = "If specified, a tar.gz archive will be retrieve from the specified download URL instead of using the RPM package to install CrateDB"
