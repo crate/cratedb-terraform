@@ -91,3 +91,6 @@ Connect to the EC2 instance using the `ec2-user` account and the configured key 
 
 ## Crate JMX Exporter
 The [Crate JMX Exporter](https://github.com/crate/jmx_exporter) exposes monitoring metrics in the Prometheus format. It is available through the load balancer on port 8080. Independent of the `crate.ssl_enable` setting, the endpoint is always accessible through `http`.
+
+## Prometheus
+[Prometheus](https://prometheus.io) is capturing the export of the Crate JMX Exporter. It is available through the load balancer on port 9090 through `https` with a self-signed certificate. Basic authentication is in place with the user `admin` and the password provided in the output variable `utility_vm_prometheus_password`.

@@ -23,3 +23,9 @@ output "utility_vm_port" {
   value       = local.ssh_alternative_port
   description = "If enabled, the utility VM can be reached using this port"
 }
+
+output "utility_vm_prometheus_password" {
+  value       = random_password.prometheus_password.result
+  sensitive   = true
+  description = "If the utility VM is enabled, this is the password to access Prometheus with CrateDB performance metrics"
+}
