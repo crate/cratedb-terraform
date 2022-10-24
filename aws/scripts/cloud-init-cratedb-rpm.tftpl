@@ -100,5 +100,9 @@ runcmd:
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
+  - curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | bash
+  - yum install -y node_exporter
+  - systemctl enable node_exporter.service
+  - systemctl start node_exporter.service
 
 final_message: "The system is finally up, after $UPTIME seconds"

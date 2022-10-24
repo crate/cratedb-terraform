@@ -58,6 +58,11 @@ write_files:
           static_configs:
             - targets:
                 ${jmx_targets}
+
+        - job_name: node_exporter
+          static_configs:
+            - targets:
+                ${node_exporter_targets}
     path: /etc/prometheus/prometheus.yml
   - content: |
       tls_server_config:
