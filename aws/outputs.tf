@@ -25,7 +25,7 @@ output "utility_vm_port" {
 }
 
 output "utility_vm_prometheus_password" {
-  value       = random_password.prometheus_password.result
+  value       = local.prometheus_password
   sensitive   = true
   description = "If the utility VM is enabled, this is the password to access Prometheus with CrateDB performance metrics"
 }

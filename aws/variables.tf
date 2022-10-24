@@ -149,3 +149,10 @@ variable "utility_vm" {
 
   description = "Configuration of the utility EC2 instance"
 }
+
+variable "prometheus_password" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "Optional password for the Prometheus admin user. If null, a random password will be assigned."
+}
