@@ -63,7 +63,40 @@ write_files:
           static_configs:
             - targets:
                 ${node_exporter_targets}
+
+        - job_name: sql_exporter
+          static_configs:
+            - targets:
+                - "localhost:9399"
     path: /etc/prometheus/prometheus.yml
+  - content: |
+      global:
+        scrape_timeout_offset: 500ms
+        min_interval: 0s
+        max_connections: 3
+        max_idle_connections: 3
+
+      target:
+        data_source_name: 'postgres://${crate_user}:${urlencode(crate_password)}@${crate_host}:5432/crate?ssl_mode=require'
+        collectors: [cratedb_standard]
+
+      collector_files:
+        - "*.collector.yml"
+    path: /etc/prometheus/sql_exporter.yml
+  - content: |
+      collector_name: cratedb_standard
+
+      metrics:
+        - metric_name: shard_distribution
+          type: gauge
+          help: "Number of shards per node"
+          key_labels: [node_name]
+          values: [shards]
+          query: |
+            SELECT node['name'] AS node_name, COUNT(*) AS shards
+            FROM sys.shards
+            GROUP BY 1;
+    path: /etc/prometheus/cratedb_standard.collector.yml
   - content: |
       tls_server_config:
         cert_file: /etc/certificate.pem
@@ -85,3 +118,6 @@ runcmd:
   - yum install -y prometheus2
   - systemctl enable prometheus.service
   - systemctl start prometheus.service
+  - yum install -y sql_exporter
+  - systemctl enable sql_exporter.service
+  - systemctl start sql_exporter.service
