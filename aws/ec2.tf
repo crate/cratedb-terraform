@@ -42,7 +42,7 @@ data "cloudinit_config" "config" {
         crate_heap_size       = var.crate.heap_size_gb
         crate_cluster_name    = var.crate.cluster_name
         crate_cluster_size    = var.crate.cluster_size
-        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
+        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
         crate_ssl_enable      = var.crate.ssl_enable
         crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
@@ -149,7 +149,7 @@ resource "aws_instance" "cratedb_node" {
   iam_instance_profile = var.instance_profile
 
   network_interface {
-    network_interface_id = element(aws_network_interface.interface.*.id, count.index)
+    network_interface_id = aws_network_interface.interface[count.index].id
     device_index         = 0
   }
 
@@ -178,19 +178,19 @@ resource "aws_lb_target_group_attachment" "http" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.http.arn
-  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
 }
 
 resource "aws_lb_target_group_attachment" "postgresql" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.postgresql.arn
-  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
 }
 
 resource "aws_lb_target_group_attachment" "jmx" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.jmx.arn
-  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
 }

@@ -48,8 +48,8 @@ resource "aws_security_group" "utilities" {
 resource "aws_network_interface" "utilities_interface" {
   count = var.enable_utility_vm ? 1 : 0
 
-  subnet_id       = element(var.subnet_ids, count.index)
-  security_groups = [element(aws_security_group.utilities.*.id, count.index)]
+  subnet_id       = var.subnet_ids[count.index]
+  security_groups = [aws_security_group.utilities[count.index].id]
 
   tags = {
     Name = "${local.config.component_name}-if-${count.index}"
@@ -83,7 +83,7 @@ resource "aws_instance" "utilities" {
   user_data         = data.cloudinit_config.config_utilities.rendered
 
   network_interface {
-    network_interface_id = element(aws_network_interface.utilities_interface.*.id, count.index)
+    network_interface_id = aws_network_interface.utilities_interface[count.index].id
     device_index         = 0
   }
 
@@ -112,8 +112,8 @@ resource "aws_lb_target_group" "utilities" {
 resource "aws_lb_target_group_attachment" "utilities" {
   count = var.enable_utility_vm ? 1 : 0
 
-  target_group_arn = element(aws_lb_target_group.utilities.*.arn, count.index)
-  target_id        = element(aws_instance.utilities.*.id, count.index)
+  target_group_arn = aws_lb_target_group.utilities[count.index].arn
+  target_id        = aws_instance.utilities[count.index].id
   port             = 22
 }
 
@@ -126,6 +126,6 @@ resource "aws_lb_listener" "utilities" {
 
   default_action {
     type             = "forward"
-    target_group_arn = element(aws_lb_target_group.utilities.*.arn, count.index)
+    target_group_arn = aws_lb_target_group.utilities[count.index].arn
   }
 }
