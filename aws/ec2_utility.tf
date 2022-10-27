@@ -83,7 +83,7 @@ data "aws_ami" "amazon_linux_utilities" {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    values = ["al2022-ami*"]
   }
 
   filter {
