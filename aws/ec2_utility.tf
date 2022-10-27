@@ -24,8 +24,8 @@ data "cloudinit_config" "config_utilities" {
         crate_user : local.config.crate_username,
         crate_password : local.cratedb_password
         prometheus_password : bcrypt(local.prometheus_password)
-        jmx_targets : indent(12, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))
-        node_exporter_targets : indent(12, yamlencode(formatlist("%s:9100", aws_network_interface.interface[*].private_ip)))
+        jmx_targets : indent(16, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))
+        node_exporter_targets : indent(16, yamlencode(formatlist("%s:9100", aws_network_interface.interface[*].private_ip)))
         ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
         ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
       }
