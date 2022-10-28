@@ -34,6 +34,13 @@ variable "crate" {
   description = "CrateDB application configuration"
 }
 
+variable "cratedb_password" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "The password to use for the CrateDB database user. If null, a random password will be assigned."
+}
+
 variable "cratedb_tar_download_url" {
   type        = string
   description = "If specified, a tar.gz archive will be retrieve from the specified download URL instead of using the RPM package to install CrateDB"
@@ -95,6 +102,12 @@ variable "instance_architecture" {
   }
 }
 
+variable "instance_profile" {
+  type        = string
+  default     = null
+  description = "An optional EC2 instance profile to assign to CrateDB nodes"
+}
+
 variable "ssh_keypair" {
   type        = string
   description = "The name of an existing EC2 key pair"
@@ -142,4 +155,11 @@ variable "utility_vm" {
   }
 
   description = "Configuration of the utility EC2 instance"
+}
+
+variable "prometheus_password" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "Optional password for the Prometheus admin user. If null, a random password will be assigned."
 }

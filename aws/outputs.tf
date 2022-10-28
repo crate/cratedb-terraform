@@ -9,7 +9,7 @@ output "cratedb_username" {
 }
 
 output "cratedb_password" {
-  value       = random_password.cratedb_password.result
+  value       = local.cratedb_password
   sensitive   = true
   description = "The password to authenticate against CrateDB"
 }
@@ -22,4 +22,10 @@ output "utility_vm_host" {
 output "utility_vm_port" {
   value       = local.ssh_alternative_port
   description = "If enabled, the utility VM can be reached using this port"
+}
+
+output "utility_vm_prometheus_password" {
+  value       = local.prometheus_password
+  sensitive   = true
+  description = "If the utility VM is enabled, this is the password to access Prometheus with CrateDB performance metrics"
 }

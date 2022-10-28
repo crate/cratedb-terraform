@@ -30,8 +30,8 @@ write_files:
       #!/bin/bash
 
       sleep 30
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://127.0.0.1:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
     owner: root:root
     path: /opt/deployment/finish.sh
     permissions: "0755"
@@ -83,10 +83,7 @@ write_files:
       CRATE_HEAP_SIZE=${crate_heap_size}g
 
       # Additional Java OPTS
-      # CRATE_JAVA_OPTS=
-
-      # Force the JVM to use IPv4 stack
-      CRATE_USE_IPV4=true
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.0.0.jar=8080"
     owner: root:root
     path: /etc/sysconfig/crate
     permissions: "0755"
@@ -99,8 +96,13 @@ runcmd:
   - yum install -y crate
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
+  - wget -P /opt/crate https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
+  - curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | bash
+  - yum install -y node_exporter
+  - systemctl enable node_exporter.service
+  - systemctl start node_exporter.service
 
 final_message: "The system is finally up, after $UPTIME seconds"

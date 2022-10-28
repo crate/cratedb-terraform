@@ -1,3 +1,7 @@
+locals {
+  cratedb_password = var.cratedb_password == null ? random_password.cratedb_password.result : var.cratedb_password
+}
+
 resource "random_password" "cratedb_password" {
   length           = 16
   special          = true
@@ -38,11 +42,11 @@ data "cloudinit_config" "config" {
       {
         crate_download_url    = var.cratedb_tar_download_url
         crate_user            = local.config.crate_username
-        crate_pass            = random_password.cratedb_password.result
+        crate_pass            = local.cratedb_password
         crate_heap_size       = var.crate.heap_size_gb
         crate_cluster_name    = var.crate.cluster_name
         crate_cluster_size    = var.crate.cluster_size
-        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface.*.private_ip))
+        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
         crate_ssl_enable      = var.crate.ssl_enable
         crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
@@ -78,6 +82,24 @@ resource "aws_security_group" "cratedb" {
     description      = "CrateDB-Transport"
     from_port        = 4300
     to_port          = 4300
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    description      = "CrateDB-JMX"
+    from_port        = 8080
+    to_port          = 8080
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    description      = "node_exporter"
+    from_port        = 9100
+    to_port          = 9100
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
@@ -131,15 +153,16 @@ resource "aws_network_interface" "interface" {
 resource "aws_instance" "cratedb_node" {
   count = var.crate.cluster_size
 
-  ami               = data.aws_ami.amazon_linux.id
-  instance_type     = var.instance_type
-  key_name          = var.ssh_keypair
-  availability_zone = element(var.availability_zones, count.index)
-  user_data         = data.cloudinit_config.config.rendered
-  monitoring        = var.enable_utility_vm
+  ami                  = data.aws_ami.amazon_linux.id
+  instance_type        = var.instance_type
+  key_name             = var.ssh_keypair
+  availability_zone    = element(var.availability_zones, count.index)
+  user_data            = data.cloudinit_config.config.rendered
+  monitoring           = var.enable_utility_vm
+  iam_instance_profile = var.instance_profile
 
   network_interface {
-    network_interface_id = element(aws_network_interface.interface.*.id, count.index)
+    network_interface_id = aws_network_interface.interface[count.index].id
     device_index         = 0
   }
 
@@ -168,12 +191,19 @@ resource "aws_lb_target_group_attachment" "http" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.http.arn
-  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
 }
 
 resource "aws_lb_target_group_attachment" "postgresql" {
   count = var.crate.cluster_size
 
   target_group_arn = aws_lb_target_group.postgresql.arn
-  target_id        = element(aws_instance.cratedb_node.*.private_ip, count.index)
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
+}
+
+resource "aws_lb_target_group_attachment" "jmx" {
+  count = var.crate.cluster_size
+
+  target_group_arn = aws_lb_target_group.jmx.arn
+  target_id        = aws_instance.cratedb_node[count.index].private_ip
 }

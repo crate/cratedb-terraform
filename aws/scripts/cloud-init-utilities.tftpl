@@ -20,11 +20,10 @@ write_files:
       done
 
       sudo -i -u ec2-user bash << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
         source ~/.bashrc
 
-        nvm install --lts
-        nvm install-latest-npm
+        nvm install node --latest-npm
 
         git clone https://github.com/proddata/nodeIngestBench.git
 
@@ -40,8 +39,84 @@ write_files:
       CRATE_PASSWORD="${crate_password}"
       CRATE_SSL="true"
     path: /root/.env
+  - content: !!binary |
+      ${ssl_private_key}
+    path: /etc/private_key.pem
+    permissions: "0666"
+  - content: !!binary |
+      ${ssl_certificate}
+    path: /etc/certificate.pem
+    permissions: "0666"
+  - content: |
+      global:
+        scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+        evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+      scrape_configs:
+        - job_name: cratedb
+          static_configs:
+            - targets:
+                ${jmx_targets}
+
+        - job_name: node_exporter
+          static_configs:
+            - targets:
+                ${node_exporter_targets}
+
+        - job_name: sql_exporter
+          static_configs:
+            - targets:
+                - "localhost:9399"
+    path: /etc/prometheus/prometheus.yml
+  - content: |
+      global:
+        scrape_timeout_offset: 500ms
+        min_interval: 0s
+        max_connections: 3
+        max_idle_connections: 3
+
+      target:
+        data_source_name: 'postgres://${crate_user}:${urlencode(crate_password)}@${crate_host}:5432/crate?ssl_mode=require'
+        collectors: [cratedb_standard]
+
+      collector_files:
+        - "*.collector.yml"
+    path: /etc/prometheus/sql_exporter.yml
+  - content: |
+      collector_name: cratedb_standard
+
+      metrics:
+        - metric_name: shard_distribution
+          type: gauge
+          help: "Number of shards per node"
+          key_labels: [node_name]
+          values: [shards]
+          query: |
+            SELECT node['name'] AS node_name, COUNT(*) AS shards
+            FROM sys.shards
+            GROUP BY 1;
+    path: /etc/prometheus/cratedb_standard.collector.yml
+  - content: |
+      tls_server_config:
+        cert_file: /etc/certificate.pem
+        key_file: /etc/private_key.pem
+
+      basic_auth_users:
+        admin: ${prometheus_password}
+    path: /etc/prometheus/web.yml
+  - content: |
+      basic_auth_users:
+        PROMETHEUS_OPTS='--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/data --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.config.file=/etc/prometheus/web.yml'
+    path: /etc/default/prometheus
 
 runcmd:
   - /root/node.sh
   - mv /root/.env /home/ec2-user/nodeIngestBench/.env
   - chown ec2-user:ec2-user /home/ec2-user/nodeIngestBench/.env
+  - curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | bash
+  - yum install -y prometheus2
+  - systemctl enable prometheus.service
+  - systemctl start prometheus.service
+  - yum install -y sql_exporter
+  - systemctl enable sql_exporter.service
+  - systemctl start sql_exporter.service

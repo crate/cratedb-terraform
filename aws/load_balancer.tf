@@ -27,6 +27,14 @@ resource "aws_lb_target_group" "postgresql" {
   }
 }
 
+resource "aws_lb_target_group" "jmx" {
+  name        = "${local.config.component_name}-target-JMX"
+  port        = 8080
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = var.vpc_id
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = 4200
@@ -46,5 +54,16 @@ resource "aws_lb_listener" "postgresql" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.postgresql.arn
+  }
+}
+
+resource "aws_lb_listener" "jmx" {
+  load_balancer_arn = aws_lb.loadbalancer.arn
+  port              = 8080
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.jmx.arn
   }
 }

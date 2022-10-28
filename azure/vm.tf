@@ -41,7 +41,7 @@ data "cloudinit_config" "config" {
         crate_heap_size       = var.crate.heap_size_gb
         crate_cluster_name    = var.crate.cluster_name
         crate_cluster_size    = var.crate.cluster_size
-        crate_nodes_ips       = indent(12, yamlencode(azurerm_network_interface.crate.*.private_ip_address))
+        crate_nodes_ips       = indent(12, yamlencode(azurerm_network_interface.crate[*].private_ip_address))
         crate_ssl_enable      = var.crate.ssl_enable
         crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
@@ -65,7 +65,7 @@ resource "azurerm_network_interface" "crate" {
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
   count                   = var.crate.cluster_size
-  network_interface_id    = element(azurerm_network_interface.crate.*.id, count.index)
+  network_interface_id    = azurerm_network_interface.crate[count.index].id
   ip_configuration_name   = "default"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
@@ -93,7 +93,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
   location            = azurerm_resource_group.rg.location
   size                = var.vm.size
 
-  network_interface_ids = [element(azurerm_network_interface.crate.*.id, count.index)]
+  network_interface_ids = [azurerm_network_interface.crate[count.index].id]
   availability_set_id   = azurerm_availability_set.main.id
 
   admin_username                  = var.vm.user
@@ -138,8 +138,8 @@ resource "azurerm_managed_disk" "data_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   count = var.crate.cluster_size
 
-  managed_disk_id    = element(azurerm_managed_disk.data_disk.*.id, count.index)
-  virtual_machine_id = element(azurerm_linux_virtual_machine.crate.*.id, count.index)
+  managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
+  virtual_machine_id = azurerm_linux_virtual_machine.crate[count.index].id
   lun                = 1
   caching            = "ReadWrite"
 }

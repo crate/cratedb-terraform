@@ -2,6 +2,13 @@
 # not be able to get a public IP address. Hence, we also attach it to the load balancer.
 locals {
   ssh_alternative_port = 2222
+  prometheus_password  = var.prometheus_password == null ? random_password.prometheus_password.result : var.prometheus_password
+}
+
+resource "random_password" "prometheus_password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
 }
 
 data "cloudinit_config" "config_utilities" {
@@ -15,7 +22,12 @@ data "cloudinit_config" "config_utilities" {
       {
         crate_host : aws_lb.loadbalancer.dns_name,
         crate_user : local.config.crate_username,
-        crate_password : random_password.cratedb_password.result
+        crate_password : local.cratedb_password
+        prometheus_password : bcrypt(local.prometheus_password)
+        jmx_targets : indent(16, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))
+        node_exporter_targets : indent(16, yamlencode(formatlist("%s:9100", aws_network_interface.interface[*].private_ip)))
+        ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
+        ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
       }
     )
   }
@@ -36,6 +48,15 @@ resource "aws_security_group" "utilities" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+  ingress {
+    description      = "Prometheus"
+    from_port        = 9090
+    to_port          = 9090
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -48,8 +69,8 @@ resource "aws_security_group" "utilities" {
 resource "aws_network_interface" "utilities_interface" {
   count = var.enable_utility_vm ? 1 : 0
 
-  subnet_id       = element(var.subnet_ids, count.index)
-  security_groups = [element(aws_security_group.utilities.*.id, count.index)]
+  subnet_id       = var.subnet_ids[count.index]
+  security_groups = [aws_security_group.utilities[count.index].id]
 
   tags = {
     Name = "${local.config.component_name}-if-${count.index}"
@@ -62,7 +83,7 @@ data "aws_ami" "amazon_linux_utilities" {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    values = ["al2022-ami*"]
   }
 
   filter {
@@ -83,7 +104,7 @@ resource "aws_instance" "utilities" {
   user_data         = data.cloudinit_config.config_utilities.rendered
 
   network_interface {
-    network_interface_id = element(aws_network_interface.utilities_interface.*.id, count.index)
+    network_interface_id = aws_network_interface.utilities_interface[count.index].id
     device_index         = 0
   }
 
@@ -109,12 +130,29 @@ resource "aws_lb_target_group" "utilities" {
   vpc_id   = var.vpc_id
 }
 
+resource "aws_lb_target_group" "prometheus" {
+  count = var.enable_utility_vm ? 1 : 0
+
+  name     = "${local.config.component_name}-target-prometheus"
+  port     = 9090
+  protocol = "TCP"
+  vpc_id   = var.vpc_id
+}
+
 resource "aws_lb_target_group_attachment" "utilities" {
   count = var.enable_utility_vm ? 1 : 0
 
-  target_group_arn = element(aws_lb_target_group.utilities.*.arn, count.index)
-  target_id        = element(aws_instance.utilities.*.id, count.index)
+  target_group_arn = aws_lb_target_group.utilities[count.index].arn
+  target_id        = aws_instance.utilities[count.index].id
   port             = 22
+}
+
+resource "aws_lb_target_group_attachment" "prometheus" {
+  count = var.enable_utility_vm ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.prometheus[count.index].arn
+  target_id        = aws_instance.utilities[count.index].id
+  port             = 9090
 }
 
 resource "aws_lb_listener" "utilities" {
@@ -126,6 +164,19 @@ resource "aws_lb_listener" "utilities" {
 
   default_action {
     type             = "forward"
-    target_group_arn = element(aws_lb_target_group.utilities.*.arn, count.index)
+    target_group_arn = aws_lb_target_group.utilities[count.index].arn
+  }
+}
+
+resource "aws_lb_listener" "prometheus" {
+  count = var.enable_utility_vm ? 1 : 0
+
+  load_balancer_arn = aws_lb.loadbalancer.arn
+  port              = 9090
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.prometheus[count.index].arn
   }
 }

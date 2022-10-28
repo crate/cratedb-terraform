@@ -88,3 +88,9 @@ Connecting via SSH can be done using the `ec2-user` account and the configured k
 Optionally, you can provision an additional EC2 instance that will not run CrateDB. Instead, it can be used to run benchmarks or other client applications. It is located in the same VPC and subnet as the CrateDB nodes for optimal network latency.
 
 Connect to the EC2 instance using the `ec2-user` account and the configured key pair. The host and port for SSH connections is available via the output variables `utility_vm_host` and `utility_vm_port`.
+
+## Crate JMX Exporter
+The [Crate JMX Exporter](https://github.com/crate/jmx_exporter) exposes monitoring metrics in the Prometheus format. It is available through the load balancer on port 8080. Independent of the `crate.ssl_enable` setting, the endpoint is always accessible through `http`.
+
+## Prometheus
+[Prometheus](https://prometheus.io) is capturing the export of the Crate JMX Exporter. It is available through the load balancer on port 9090 through `https` with a self-signed certificate. Basic authentication is in place with the user `admin` and the password provided in the output variable `utility_vm_prometheus_password`.
