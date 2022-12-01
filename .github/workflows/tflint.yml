@@ -14,7 +14,7 @@ jobs:
         working-directory: aws
     steps:
       - uses: actions/checkout@v3
-      - uses: terraform-linters/setup-tflint@v2
+      - uses: terraform-linters/setup-tflint@v3
       - run: tflint --init
       - run: tflint --format compact
 
@@ -25,6 +25,6 @@ jobs:
         working-directory: azure
     steps:
       - uses: actions/checkout@v3
-      - uses: terraform-linters/setup-tflint@v2
+      - uses: terraform-linters/setup-tflint@v3
       - run: tflint --init
       - run: tflint --format compact
