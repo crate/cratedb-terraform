@@ -109,7 +109,19 @@ resource "aws_instance" "utilities" {
   }
 
   root_block_device {
-    volume_size = var.utility_vm.disk_size_gb
+    volume_size = 50
+  }
+
+  dynamic "ebs_block_device" {
+    for_each = var.utility_vm.disk_size_gb != null ? [1] : []
+
+    content {
+      device_name = "/dev/sdh"
+      volume_size = var.utility_vm.disk_size_gb
+      volume_type = "gp3"
+      iops        = var.utility_vm.disk_iops
+      throughput  = var.utility_vm.disk_throughput
+    }
   }
 
   lifecycle {

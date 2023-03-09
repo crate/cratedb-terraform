@@ -146,12 +146,16 @@ variable "utility_vm" {
     instance_type         = string
     instance_architecture = string
     disk_size_gb          = number
+    disk_iops             = number
+    disk_throughput       = number
   })
 
   default = {
     instance_type         = "t3.xlarge"
     instance_architecture = "x86_64"
     disk_size_gb          = 50
+    disk_iops             = null
+    disk_throughput       = null
   }
 
   description = "Configuration of the utility EC2 instance"
