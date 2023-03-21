@@ -5,7 +5,6 @@ package_upgrade: true
 package_reboot_if_required: true
 
 packages:
-  - wget
   - openssl
   - htop
 
@@ -160,11 +159,11 @@ runcmd:
   - chmod 700 /opt/data
   - openssl pkcs12 -export -in /opt/crate/config/certificate.pem -inkey /opt/crate/config/private_key.pem -certfile /opt/crate/config/certificate.pem -out /opt/crate/config/keystore.p12 -passout pass:changeit
   - rm /opt/crate/config/certificate.pem && rm /opt/crate/config/private_key.pem
-  - wget --no-verbose ${crate_download_url}
+  - curl -O ${crate_download_url}
   - tar -xf crate-*.tar.gz
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
-  - wget -P /opt/crate https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
   - chown -R crate:crate /opt/crate
   - sysctl -w vm.max_map_count=262144
   - systemctl daemon-reload
