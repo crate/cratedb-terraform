@@ -96,7 +96,7 @@ runcmd:
   - yum install -y crate
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
-  - wget -P /opt/crate https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
