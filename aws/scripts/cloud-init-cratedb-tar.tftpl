@@ -151,6 +151,31 @@ write_files:
     owner: root:root
     path: /usr/lib/systemd/system/crate.service
     permissions: "0444"
+  - content: |
+      [prometheus-rpm_release]
+      name=prometheus-rpm_release
+      baseurl=https://packagecloud.io/prometheus-rpm/release/el/8/$basearch
+      repo_gpgcheck=0
+      gpgcheck=0
+      enabled=1
+      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
+      sslverify=1
+      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+      metadata_expire=300
+
+      [prometheus-rpm_release-source]
+      name=prometheus-rpm_release-source
+      baseurl=https://packagecloud.io/prometheus-rpm/release/el/8/SRPMS
+      repo_gpgcheck=0
+      gpgcheck=0
+      enabled=1
+      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
+      sslverify=1
+      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+      metadata_expire=300
+    owner: root:root
+    path: /etc/yum.repos.d/prometheus-rpm_release.repo
+    permissions: "0644"
 
 runcmd:
   - groupadd -r crate
@@ -170,7 +195,6 @@ runcmd:
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
-  - curl -s https://packagecloud.io/install/repositories/prometheus-rpm/release/script.rpm.sh | bash
   - yum install -y node_exporter
   - systemctl enable node_exporter.service
   - systemctl start node_exporter.service
