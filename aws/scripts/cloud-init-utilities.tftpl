@@ -4,6 +4,14 @@ package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 
+yum_repos:
+  prometheus-rpm:
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/9/$basearch
+    enabled: true
+    gpgcheck: false
+    gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
+    name: prometheus-rpm
+
 packages:
   - git
   - tmux
@@ -108,31 +116,6 @@ write_files:
       basic_auth_users:
         PROMETHEUS_OPTS='--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/data --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.config.file=/etc/prometheus/web.yml'
     path: /etc/default/prometheus
-  - content: |
-      [prometheus-rpm_release]
-      name=prometheus-rpm_release
-      baseurl=https://packagecloud.io/prometheus-rpm/release/el/9/$basearch
-      repo_gpgcheck=0
-      gpgcheck=0
-      enabled=1
-      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
-      sslverify=1
-      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-      metadata_expire=300
-
-      [prometheus-rpm_release-source]
-      name=prometheus-rpm_release-source
-      baseurl=https://packagecloud.io/prometheus-rpm/release/el/9/SRPMS
-      repo_gpgcheck=0
-      gpgcheck=0
-      enabled=1
-      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
-      sslverify=1
-      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-      metadata_expire=300
-    owner: root:root
-    path: /etc/yum.repos.d/prometheus-rpm_release.repo
-    permissions: "0644"
 
 runcmd:
   - /root/node.sh

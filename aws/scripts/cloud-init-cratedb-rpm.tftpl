@@ -4,10 +4,19 @@ package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 
+yum_repos:
+  prometheus-rpm:
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/8/$basearch
+    enabled: true
+    gpgcheck: false
+    gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
+    name: prometheus-rpm
+
 packages:
   - curl
   - openssl
   - htop
+  - node_exporter
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
@@ -87,31 +96,6 @@ write_files:
     owner: root:root
     path: /etc/sysconfig/crate
     permissions: "0755"
-  - content: |
-      [prometheus-rpm_release]
-      name=prometheus-rpm_release
-      baseurl=https://packagecloud.io/prometheus-rpm/release/el/8/$basearch
-      repo_gpgcheck=0
-      gpgcheck=0
-      enabled=1
-      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
-      sslverify=1
-      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-      metadata_expire=300
-
-      [prometheus-rpm_release-source]
-      name=prometheus-rpm_release-source
-      baseurl=https://packagecloud.io/prometheus-rpm/release/el/8/SRPMS
-      repo_gpgcheck=0
-      gpgcheck=0
-      enabled=1
-      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
-      sslverify=1
-      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-      metadata_expire=300
-    owner: root:root
-    path: /etc/yum.repos.d/prometheus-rpm_release.repo
-    permissions: "0644"
 
 runcmd:
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
@@ -125,7 +109,6 @@ runcmd:
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
-  - yum install -y node_exporter
   - systemctl enable node_exporter.service
   - systemctl start node_exporter.service
 
