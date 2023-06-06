@@ -11,9 +11,15 @@ yum_repos:
     gpgcheck: false
     gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
     name: prometheus-rpm
+  # workaround for crate-release RPM package not being compatible with AL2023 as of now
+  cratedb:
+    baseurl: https://cdn.crate.io/downloads/yum/7/$basearch
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://cdn.crate.io/downloads/yum/RPM-GPG-KEY-crate
+    name: CrateDB stable releases
 
 packages:
-  - curl
   - openssl
   - htop
   - node_exporter
@@ -100,10 +106,8 @@ write_files:
 runcmd:
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
-  - rpm --import https://cdn.crate.io/downloads/yum/RPM-GPG-KEY-crate
-  - rpm -Uvh https://cdn.crate.io/downloads/yum/7/x86_64/crate-release-7.0-1.x86_64.rpm
-  - yum install -y crate
-  - chown -R crate:crate /opt/data
+  - dnf install -y crate
+  - chown -R crate:crate /opt/data /etc/crate
   - chmod 700 /opt/data
   - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
   - systemctl enable crate
