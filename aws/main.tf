@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "aws"
-      version = "~> 5.7"
+      version = "~> 5.22"
     }
 
     cloudinit = {
@@ -14,7 +14,7 @@ terraform {
 
     random = {
       source  = "random"
-      version = "~> 3.4"
+      version = "~> 3.5"
     }
 
     tls = {
