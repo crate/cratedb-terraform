@@ -45,8 +45,8 @@ write_files:
       #!/bin/bash
 
       sleep 30
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt": "CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
+      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt": "GRANT ALL PRIVILEGES TO ${crate_user};"}'
     owner: root:root
     path: /opt/deployment/finish.sh
     permissions: "0755"
