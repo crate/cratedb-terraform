@@ -163,3 +163,9 @@ variable "prometheus_password" {
   sensitive   = true
   description = "Optional password for the Prometheus admin user. If null, a random password will be assigned."
 }
+
+variable "prometheus_ssl" {
+  type        = bool
+  default     = true
+  description = "If true, a self-signed SSL certificate will be generated for accessing Prometheus."
+}
