@@ -181,7 +181,7 @@ resource "aws_instance" "cratedb_node" {
   }
 
   lifecycle {
-    ignore_changes = [user_data]
+    ignore_changes = [user_data,ami]
   }
 
   tags = {
