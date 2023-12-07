@@ -4,9 +4,8 @@ jobs:
   terraform_fmt:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-        with:
-            terraform_version: "1.5.7"
       - run: terraform fmt -check -recursive
 
   lint_aws:
