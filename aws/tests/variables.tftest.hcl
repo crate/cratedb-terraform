@@ -54,7 +54,5 @@ run "password with double dollar signs" {
     cratedb_password = "ab$$cd"
   }
 
-  expect_failures = [
-    var.cratedb_password,
-  ]
+  expect_failures = [var.cratedb_password]
 }
