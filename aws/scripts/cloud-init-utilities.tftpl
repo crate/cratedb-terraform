@@ -16,6 +16,8 @@ packages:
   - git
   - tmux
   - htop
+  - nano
+  - python3-pip
 
 write_files:
   - content: |
@@ -28,7 +30,7 @@ write_files:
       done
 
       sudo -i -u ec2-user bash << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         source ~/.bashrc
 
         nvm install node --latest-npm
@@ -37,6 +39,8 @@ write_files:
 
         cd ~/nodeIngestBench
         npm install
+
+        pip3 install locust
       EOF
     owner: root:root
     path: /root/node.sh
@@ -45,7 +49,7 @@ write_files:
       CRATE_USER="${crate_user}"
       CRATE_HOST="${crate_host}"
       CRATE_PASSWORD="${crate_password}"
-      CRATE_SSL="true"
+      CRATE_SSL="${crate_ssl ? "true" : "false"}"
     path: /root/.env
   - content: !!binary |
       ${ssl_private_key}
@@ -77,18 +81,7 @@ write_files:
                 - "localhost:9399"
     path: /etc/prometheus/prometheus.yml
   - content: |
-      global:
-        scrape_timeout_offset: 500ms
-        min_interval: 0s
-        max_connections: 3
-        max_idle_connections: 3
-
-      target:
-        data_source_name: 'postgres://${crate_user}:${urlencode(crate_password)}@${crate_host}:5432/crate?ssl_mode=require'
-        collectors: [cratedb_standard]
-
-      collector_files:
-        - "*.collector.yml"
+      ${sql_exporter_config}
     path: /etc/prometheus/sql_exporter.yml
   - content: |
       collector_name: cratedb_standard
@@ -105,12 +98,7 @@ write_files:
             GROUP BY 1;
     path: /etc/prometheus/cratedb_standard.collector.yml
   - content: |
-      tls_server_config:
-        cert_file: /etc/certificate.pem
-        key_file: /etc/private_key.pem
-
-      basic_auth_users:
-        admin: ${prometheus_password}
+      ${prometheus_config}
     path: /etc/prometheus/web.yml
   - content: |
       basic_auth_users:

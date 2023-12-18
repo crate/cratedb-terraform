@@ -3,6 +3,30 @@
 locals {
   ssh_alternative_port = 2222
   prometheus_password  = var.prometheus_password == null ? random_password.prometheus_password.result : var.prometheus_password
+  prometheus_config = {
+    "basic_auth_users" : {
+      "admin" : bcrypt(local.prometheus_password)
+    }
+  }
+  prometheus_ssl_config = {
+    "tls_server_config" : {
+      "cert_file" : "/etc/certificate.pem",
+      "key_file" : "/etc/private_key.pem"
+    }
+  }
+  sql_exporter_config = {
+    "global" : {
+      "scrape_timeout_offset" : "500ms",
+      "min_interval" : "0s",
+      "max_connections" : 3,
+      "max_idle_connections" : 3
+    },
+    "target" : {
+      "data_source_name" : "postgres://${local.config.crate_username}:${urlencode(local.cratedb_password)}@${aws_lb.loadbalancer.dns_name}:5432/crate?sslmode=${var.crate.ssl_enable ? "require" : "disable"}",
+      "collectors" : ["cratedb_standard"]
+    },
+    "collector_files" : ["*.collector.yml"]
+  }
 }
 
 resource "random_password" "prometheus_password" {
@@ -20,14 +44,16 @@ data "cloudinit_config" "config_utilities" {
     content_type = "text/cloud-config"
     content = templatefile("${path.module}/scripts/cloud-init-utilities.tftpl",
       {
-        crate_host : aws_lb.loadbalancer.dns_name,
-        crate_user : local.config.crate_username,
-        crate_password : local.cratedb_password
-        prometheus_password : bcrypt(local.prometheus_password)
-        jmx_targets : indent(16, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))
-        node_exporter_targets : indent(16, yamlencode(formatlist("%s:9100", aws_network_interface.interface[*].private_ip)))
-        ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
-        ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
+        crate_host            = aws_lb.loadbalancer.dns_name
+        crate_user            = local.config.crate_username
+        crate_password        = local.cratedb_password
+        crate_ssl             = var.crate.ssl_enable
+        prometheus_config     = indent(6, yamlencode(var.prometheus_ssl ? merge(local.prometheus_config, local.prometheus_ssl_config) : local.prometheus_config))
+        sql_exporter_config   = indent(6, yamlencode(local.sql_exporter_config))
+        jmx_targets           = indent(16, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))
+        node_exporter_targets = indent(16, yamlencode(formatlist("%s:9100", aws_network_interface.interface[*].private_ip)))
+        ssl_certificate       = base64encode(tls_self_signed_cert.ssl.cert_pem)
+        ssl_private_key       = base64encode(tls_private_key.ssl.private_key_pem)
       }
     )
   }
@@ -52,6 +78,15 @@ resource "aws_security_group" "utilities" {
     description      = "Prometheus"
     from_port        = 9090
     to_port          = 9090
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    description      = "Locust"
+    from_port        = 8089
+    to_port          = 8089
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]

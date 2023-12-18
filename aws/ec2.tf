@@ -40,16 +40,18 @@ data "cloudinit_config" "config" {
     content_type = "text/cloud-config"
     content = templatefile("${path.module}/scripts/cloud-init-cratedb-${var.cratedb_tar_download_url == null ? "rpm" : "tar"}.tftpl",
       {
-        crate_download_url    = var.cratedb_tar_download_url
-        crate_user            = local.config.crate_username
-        crate_pass            = local.cratedb_password
-        crate_heap_size       = var.crate.heap_size_gb
-        crate_cluster_name    = var.crate.cluster_name
-        crate_cluster_size    = var.crate.cluster_size
-        crate_nodes_ips       = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
-        crate_ssl_enable      = var.crate.ssl_enable
-        crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
-        crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
+        user_provisioning_file = indent(6, file(("${path.module}/scripts/user_provisioning.sh")))
+        crate_download_url     = var.cratedb_tar_download_url
+        crate_user             = local.config.crate_username
+        crate_pass             = local.cratedb_password
+        crate_heap_size        = var.crate.heap_size_gb
+        crate_cluster_name     = var.crate.cluster_name
+        crate_cluster_size     = var.crate.cluster_size
+        crate_nodes_ips        = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
+        crate_ssl_enable       = var.crate.ssl_enable
+        crate_protocol         = var.crate.ssl_enable ? "https" : "http"
+        crate_ssl_certificate  = base64encode(tls_self_signed_cert.ssl.cert_pem)
+        crate_ssl_private_key  = base64encode(tls_private_key.ssl.private_key_pem)
       }
     )
   }

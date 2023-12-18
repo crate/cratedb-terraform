@@ -39,6 +39,10 @@ variable "cratedb_password" {
   default     = null
   sensitive   = true
   description = "The password to use for the CrateDB database user. If null, a random password will be assigned."
+  validation {
+    condition     = var.cratedb_password == null || !can(regex("\"|\\$\\$", var.cratedb_password))
+    error_message = "The CrateDB password must not contain any of the following character sequences: $$, \""
+  }
 }
 
 variable "cratedb_tar_download_url" {
@@ -162,4 +166,10 @@ variable "prometheus_password" {
   default     = null
   sensitive   = true
   description = "Optional password for the Prometheus admin user. If null, a random password will be assigned."
+}
+
+variable "prometheus_ssl" {
+  type        = bool
+  default     = true
+  description = "If true, a self-signed SSL certificate will be generated for accessing Prometheus."
 }

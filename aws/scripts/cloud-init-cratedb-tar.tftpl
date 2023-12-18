@@ -6,7 +6,7 @@ package_reboot_if_required: true
 
 yum_repos:
   prometheus-rpm:
-    baseurl: https://packagecloud.io/prometheus-rpm/release/el/8/$basearch
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/9/$basearch
     enabled: true
     gpgcheck: false
     gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
@@ -35,13 +35,9 @@ write_files:
     path: /opt/crate/config/certificate.pem
     permissions: "0660"
   - content: |
-      #!/bin/bash
-
-      sleep 30
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"CREATE USER ${crate_user} WITH (password = '\''${crate_pass}'\'');"}'
-      curl -sS -H 'Content-Type: application/json' -k -X POST 'http${crate_ssl_enable ? "s" : ""}://localhost:4200/_sql' -d '{"stmt":"GRANT ALL PRIVILEGES TO ${crate_user};"}'
+      ${user_provisioning_file}
     owner: root:root
-    path: /opt/deployment/finish.sh
+    path: /opt/deployment/user_provisioning.sh
     permissions: "0755"
   - content: |
         path.data: /opt/data
@@ -178,7 +174,7 @@ runcmd:
   - systemctl daemon-reload
   - systemctl enable crate
   - systemctl start crate
-  - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
+  - bash /opt/deployment/user_provisioning.sh "${crate_protocol}" "${crate_user}" "${crate_pass}" && rm -f /opt/deployment/user_provisioning.sh
   - systemctl enable node_exporter.service
   - systemctl start node_exporter.service
 
