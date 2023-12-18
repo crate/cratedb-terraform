@@ -40,7 +40,7 @@ variable "cratedb_password" {
   sensitive   = true
   description = "The password to use for the CrateDB database user. If null, a random password will be assigned."
   validation {
-    condition     = var.cratedb_password == null || (!strcontains(var.cratedb_password, "$$") && !strcontains(var.cratedb_password, "\""))
+    condition     = var.cratedb_password == null || !can(regex("\"|\\$\\$", var.cratedb_password))
     error_message = "The CrateDB password must not contain any of the following character sequences: $$, \""
   }
 }
