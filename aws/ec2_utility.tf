@@ -148,7 +148,7 @@ resource "aws_instance" "utilities" {
   }
 
   lifecycle {
-    ignore_changes = [user_data,ami]
+    ignore_changes = [user_data, ami]
   }
 
   tags = {
