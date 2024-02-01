@@ -5,7 +5,7 @@ variables {
   availability_zones = ["az-1"]
 }
 
-run "no CrateDB download URL" {
+run "no_CrateDB_download_url" {
   command = plan
 
   variables {
@@ -13,7 +13,7 @@ run "no CrateDB download URL" {
   }
 }
 
-run "valid CrateDB download URL" {
+run "valid_CrateDB_download_url" {
   command = plan
 
   variables {
@@ -21,7 +21,7 @@ run "valid CrateDB download URL" {
   }
 }
 
-run "invalid CrateDB download URL" {
+run "invalid_CrateDB_download_url" {
   command = plan
 
   variables {
@@ -31,7 +31,7 @@ run "invalid CrateDB download URL" {
   expect_failures = [var.cratedb_tar_download_url]
 }
 
-run "no CrateDB password" {
+run "no_CrateDB_password" {
   command = plan
 
   variables {
@@ -39,7 +39,7 @@ run "no CrateDB password" {
   }
 }
 
-run "valid CrateDB password" {
+run "valid_CrateDB_password" {
   command = plan
 
   variables {
@@ -47,7 +47,7 @@ run "valid CrateDB password" {
   }
 }
 
-run "password with double dollar signs" {
+run "password_with_double_dollar_signs" {
   command = plan
 
   variables {
