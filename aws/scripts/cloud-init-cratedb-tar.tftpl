@@ -94,12 +94,13 @@ write_files:
       # Additional Java OPTS
       CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.0.0.jar=8080"
     owner: root:root
-    path: /etc/sysconfig/crate
+    path: /etc/default/crate
     permissions: "0755"
   - content: |
       [Unit]
       Description=CrateDB Server
-      Documentation=https://crate.io/docs
+      Documentation=https://crate.io/docs/
+      Wants=network.target
       After=network.target
 
       [Service]
@@ -111,7 +112,7 @@ write_files:
       # default environment variables
       Environment="CRATE_HOME=/opt/crate"
       # load environment
-      EnvironmentFile=-/etc/sysconfig/crate
+      EnvironmentFile=-/etc/default/crate
 
       ExecStart=/opt/crate/bin/crate
 
@@ -133,23 +134,11 @@ write_files:
       # When a JVM receives a SIGTERM signal it exits with code 143
       SuccessExitStatus=143 SIGTERM SIGKILL
 
-      # Override these settings with a file called
-      # /etc/systemd/system/crate.service.d/crate.conf and specify any changes
-
-      # Specifies the maximum number of bytes of memory that may be locked into RAM
       LimitMEMLOCK=infinity
-
-      # Specifies the maximum file descriptor number that can be opened by this process
-      LimitNOFILE=65536
-
-      # Specifies the maximum number of processes
+      LimitNOFILE=262144
       LimitNPROC=4096
-
-      # Specifies the maximum file size
-      LimitFSIZE=infinity
-
-      # Specifies limit of virtual memory that can be used
       LimitAS=infinity
+
 
       [Install]
       WantedBy=multi-user.target
