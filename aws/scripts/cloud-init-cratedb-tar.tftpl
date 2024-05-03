@@ -79,11 +79,6 @@ write_files:
     path: /etc/sysctl.d/crate.conf
     permissions: "0755"
   - content: |
-      # Maximum locked memory size. Set to "unlimited" if you use the
-      # bootstrap.mlockall option in crate.yml. You must also set
-      # CRATE_HEAP_SIZE.
-      MAX_LOCKED_MEMORY=unlimited
-
       # Recommended memory settings for production:
       # - assign half of the OS memory to CrateDB
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
@@ -159,7 +154,6 @@ runcmd:
   - mv crate-*/config/log4j2.properties /opt/crate/config
   - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.1.0/crate-jmx-exporter-1.1.0.jar
   - chown -R crate:crate /opt/crate
-  - sysctl -w vm.max_map_count=262144
   - systemctl daemon-reload
   - systemctl enable crate
   - systemctl start crate

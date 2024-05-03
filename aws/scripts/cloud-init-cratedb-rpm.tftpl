@@ -16,6 +16,8 @@ yum_repos:
     enabled: true
     gpgcheck: true
     gpgkey: https://cdn.crate.io/downloads/yum/RPM-GPG-KEY-crate
+    type: rpm-md
+    autorefresh: true
     name: CrateDB stable releases
 
 packages:
@@ -81,11 +83,6 @@ write_files:
     path: /etc/crate/crate.yml
     permissions: "0755"
   - content: |
-      # Maximum locked memory size. Set to "unlimited" if you use the
-      # bootstrap.mlockall option in crate.yml. You must also set
-      # CRATE_HEAP_SIZE.
-      MAX_LOCKED_MEMORY=unlimited
-
       # Recommended memory settings for production:
       # - assign half of the OS memory to CrateDB
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
