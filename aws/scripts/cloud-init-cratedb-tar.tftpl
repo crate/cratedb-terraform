@@ -91,8 +91,8 @@ write_files:
       # Heap Size (defaults to 256m min, 1g max)
       CRATE_HEAP_SIZE=${crate_heap_size}g
 
-      # Additional Java OPTS
-      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.0.0.jar=8080"
+      # Additional Java options
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.1.0.jar=8080"
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -157,7 +157,7 @@ runcmd:
   - tar -xf crate-*.tar.gz
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
-  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.1.0/crate-jmx-exporter-1.1.0.jar
   - chown -R crate:crate /opt/crate
   - sysctl -w vm.max_map_count=262144
   - systemctl daemon-reload
