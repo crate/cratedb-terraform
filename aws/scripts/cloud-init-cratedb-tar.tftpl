@@ -79,11 +79,6 @@ write_files:
     path: /etc/sysctl.d/crate.conf
     permissions: "0755"
   - content: |
-      # Maximum locked memory size. Set to "unlimited" if you use the
-      # bootstrap.mlockall option in crate.yml. You must also set
-      # CRATE_HEAP_SIZE.
-      MAX_LOCKED_MEMORY=unlimited
-
       # Recommended memory settings for production:
       # - assign half of the OS memory to CrateDB
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
@@ -91,8 +86,8 @@ write_files:
       # Heap Size (defaults to 256m min, 1g max)
       CRATE_HEAP_SIZE=${crate_heap_size}g
 
-      # Additional Java OPTS
-      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.0.0.jar=8080"
+      # Additional Java options
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.1.0.jar=8080"
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -145,8 +140,21 @@ write_files:
     owner: root:root
     path: /usr/lib/systemd/system/crate.service
     permissions: "0444"
+  - content: |
+      vm.max_map_count = 262144
+
+      # Certain load balancers (i.e. AWS NLB) terminate idle connections.
+      # We set explicit TCP keepalives so that this does not happen.
+      # https://github.com/crate/crate-operator/commit/383c5f4795e58fe1a61fab0cfdfba4e294953f9f
+      net.ipv4.tcp_keepalive_time = 120
+      net.ipv4.tcp_keepalive_intvl = 30
+      net.ipv4.tcp_keepalive_probes = 6
+    owner: root:root
+    path: /etc/sysctl.d/90-crate-net.conf
+    permissions: "0644"
 
 runcmd:
+  - sysctl -p /etc/sysctl.d/90-crate-net.conf
   - groupadd -r crate
   - useradd -r -g crate -d /opt/crate -s /sbin/nologin -c "Dude, it's a storage!" crate
   - chown -R crate:crate /opt/data
@@ -157,9 +165,8 @@ runcmd:
   - tar -xf crate-*.tar.gz
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
-  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.0.0/crate-jmx-exporter-1.0.0.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.1.0/crate-jmx-exporter-1.1.0.jar
   - chown -R crate:crate /opt/crate
-  - sysctl -w vm.max_map_count=262144
   - systemctl daemon-reload
   - systemctl enable crate
   - systemctl start crate
