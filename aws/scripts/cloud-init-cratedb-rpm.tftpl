@@ -95,8 +95,19 @@ write_files:
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
+  - content: |
+      # Certain load balancers (i.e. AWS NLB) terminate idle connections.
+      # We set explicit TCP keepalives so that this does not happen.
+      # https://github.com/crate/crate-operator/commit/383c5f4795e58fe1a61fab0cfdfba4e294953f9f
+      net.ipv4.tcp_keepalive_time = 120
+      net.ipv4.tcp_keepalive_intvl = 30
+      net.ipv4.tcp_keepalive_probes = 6
+    owner: root:root
+    path: /etc/sysctl.d/90-crate-net.conf
+    permissions: "0644"
 
 runcmd:
+  - sysctl -p /etc/sysctl.d/90-crate-net.conf
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
   - dnf install -y crate

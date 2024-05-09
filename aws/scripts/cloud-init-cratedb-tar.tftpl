@@ -140,8 +140,21 @@ write_files:
     owner: root:root
     path: /usr/lib/systemd/system/crate.service
     permissions: "0444"
+  - content: |
+      vm.max_map_count = 262144
+
+      # Certain load balancers (i.e. AWS NLB) terminate idle connections.
+      # We set explicit TCP keepalives so that this does not happen.
+      # https://github.com/crate/crate-operator/commit/383c5f4795e58fe1a61fab0cfdfba4e294953f9f
+      net.ipv4.tcp_keepalive_time = 120
+      net.ipv4.tcp_keepalive_intvl = 30
+      net.ipv4.tcp_keepalive_probes = 6
+    owner: root:root
+    path: /etc/sysctl.d/90-crate-net.conf
+    permissions: "0644"
 
 runcmd:
+  - sysctl -p /etc/sysctl.d/90-crate-net.conf
   - groupadd -r crate
   - useradd -r -g crate -d /opt/crate -s /sbin/nologin -c "Dude, it's a storage!" crate
   - chown -R crate:crate /opt/data
