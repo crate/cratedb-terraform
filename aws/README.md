@@ -13,11 +13,12 @@ For a full list of available variables (including disk configuration), please se
 
 The main setup consists of the following steps:
 
-1. Crate a new `main.tf` Terraform configuration, referencing the CrateDB module:
+1. Create a new directory that will contain the Terraform configuration as well as all state information: `mkdir cratedb-terraform-example && cd cratedb-terraform-example`
+2. Crate a new `main.tf` Terraform configuration in that directory, referencing the CrateDB module from this repository:
 
     ```hcl
     module "cratedb-cluster" {
-      source = "git@github.com:crate/crate-terraform.git//aws"
+      source = "github.com/crate/cratedb-terraform.git/aws"
 
       # Global configuration items for naming/tagging resources
       config = {
@@ -69,7 +70,14 @@ The main setup consists of the following steps:
     }
     ```
 
-2. Run `terraform init` to download and install all needed providers.
+3. Run `terraform init` to download and install all needed providers.
+4. Provide AWS credentials. There are several options [available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration). The easiest option is to store credentials in your home directory by creating the file `~/.aws/credentials` with the below content:
+
+    ```yaml
+    [default]
+    aws_access_key_id = <Access Key ID>
+    aws_secret_access_key = <Secret Access Key>
+    ```
 
 ## Execution
 
