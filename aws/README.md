@@ -14,7 +14,7 @@ For a full list of available variables (including disk configuration), please se
 The main setup consists of the following steps:
 
 1. Create a new directory that will contain the Terraform configuration as well as all state information: `mkdir cratedb-terraform-example && cd cratedb-terraform-example`
-2. Crate a new `main.tf` Terraform configuration in that directory, referencing the CrateDB module from this repository:
+2. Create a new `main.tf` Terraform configuration in that directory, referencing the CrateDB module from this repository:
 
     ```hcl
     module "cratedb-cluster" {
