@@ -25,6 +25,7 @@ packages:
   - htop
   - node_exporter
   - jq
+  - nano
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
