@@ -16,6 +16,7 @@ packages:
   - openssl
   - htop
   - node_exporter
+  - nano
 
 bootcmd:
   - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
