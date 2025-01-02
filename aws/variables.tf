@@ -34,6 +34,12 @@ variable "crate" {
   description = "CrateDB application configuration"
 }
 
+variable "cratedb_settings" {
+  type        = map(string)
+  default     = {}
+  description = "CrateDB settings applied to crate.yml"
+}
+
 variable "cratedb_password" {
   type        = string
   default     = null

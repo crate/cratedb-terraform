@@ -52,6 +52,7 @@ data "cloudinit_config" "config" {
         crate_protocol         = var.crate.ssl_enable ? "https" : "http"
         crate_ssl_certificate  = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key  = base64encode(tls_private_key.ssl.private_key_pem)
+        cratedb_user_settings  = indent(8, yamlencode(var.cratedb_settings))
       }
     )
   }

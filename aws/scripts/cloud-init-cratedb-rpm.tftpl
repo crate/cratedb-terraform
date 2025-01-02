@@ -80,6 +80,8 @@ write_files:
         ssl.keystore_filepath: /etc/crate/keystore.p12
         ssl.keystore_password: changeit
         ssl.keystore_key_password: changeit
+
+        ${cratedb_user_settings}
     owner: root:root
     path: /etc/crate/crate.yml
     permissions: "0755"
