@@ -71,6 +71,8 @@ write_files:
         ssl.keystore_filepath: /opt/crate/config/keystore.p12
         ssl.keystore_password: changeit
         ssl.keystore_key_password: changeit
+
+        ${cratedb_user_settings}
     owner: root:root
     path: /opt/crate/config/crate.yml
     permissions: "0755"
@@ -85,10 +87,10 @@ write_files:
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
       # - disable swapping my setting bootstrap.mlockall in crate.yml
       # Heap Size (defaults to 256m min, 1g max)
-      CRATE_HEAP_SIZE=${crate_heap_size}g
+      CRATE_HEAP_SIZE=${crate_heap_size}
 
       # Additional Java options
-      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.1.0.jar=8080"
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.2.0.jar=8080"
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -166,7 +168,7 @@ runcmd:
   - tar -xf crate-*.tar.gz
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
-  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.1.0/crate-jmx-exporter-1.1.0.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.0/crate-jmx-exporter-1.2.0.jar
   - chown -R crate:crate /opt/crate
   - systemctl daemon-reload
   - systemctl enable crate

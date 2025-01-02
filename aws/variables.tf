@@ -18,20 +18,26 @@ variable "config" {
 
 variable "crate" {
   type = object({
-    heap_size_gb = number
+    heap_size    = string
     cluster_name = string
     cluster_size = number
     ssl_enable   = bool
   })
 
   default = {
-    heap_size_gb = 2
+    heap_size    = "2g"
     cluster_name = "CrateDB-Cluster"
     cluster_size = 3
     ssl_enable   = true
   }
 
   description = "CrateDB application configuration"
+}
+
+variable "cratedb_settings" {
+  type        = map(string)
+  default     = {}
+  description = "CrateDB settings applied to crate.yml"
 }
 
 variable "cratedb_password" {
