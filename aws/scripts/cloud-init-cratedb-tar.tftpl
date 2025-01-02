@@ -85,7 +85,7 @@ write_files:
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
       # - disable swapping my setting bootstrap.mlockall in crate.yml
       # Heap Size (defaults to 256m min, 1g max)
-      CRATE_HEAP_SIZE=${crate_heap_size}g
+      CRATE_HEAP_SIZE=${crate_heap_size}
 
       # Additional Java options
       CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.1.0.jar=8080"

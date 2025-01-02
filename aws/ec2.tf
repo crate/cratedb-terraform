@@ -44,7 +44,7 @@ data "cloudinit_config" "config" {
         crate_download_url     = var.cratedb_tar_download_url
         crate_user             = local.config.crate_username
         crate_pass             = local.cratedb_password
-        crate_heap_size        = var.crate.heap_size_gb
+        crate_heap_size        = var.crate.heap_size
         crate_cluster_name     = var.crate.cluster_name
         crate_cluster_size     = var.crate.cluster_size
         crate_nodes_ips        = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
