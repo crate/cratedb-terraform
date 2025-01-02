@@ -30,8 +30,8 @@ The main setup consists of the following steps:
 
       # CrateDB-specific configuration
       crate = {
-        # Java Heap size in GB available to CrateDB
-        heap_size_gb = 2
+        # Java Heap size available to CrateDB
+        heap_size = "2g"
 
         cluster_name = "crate-cluster"
 
