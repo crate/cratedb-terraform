@@ -1,8 +1,8 @@
 module github.com/crate/crate-terraform
 
-go 1.22.7
+go 1.23.0
 
-toolchain go1.23.2
+toolchain go1.24.0
 
 require (
 	github.com/gruntwork-io/terratest v0.48.2
@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
 	github.com/hashicorp/terraform-json v0.24.0 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-zglob v0.0.6 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -33,14 +33,14 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/tmccombs/hcl2json v0.6.5 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
-	github.com/zclconf/go-cty v1.15.1 // indirect
-	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/tools v0.28.0 // indirect
+	github.com/zclconf/go-cty v1.16.2 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/mod v0.23.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/tools v0.30.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
