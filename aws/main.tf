@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "aws"
-      version = "~> 5.46"
+      version = "~> 5.82"
     }
 
     cloudinit = {
