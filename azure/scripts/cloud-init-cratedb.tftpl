@@ -6,11 +6,10 @@ package_reboot_if_required: true
 
 packages:
   - apt-transport-https
+  - apt-utils
   - ca-certificates
   - curl
-  - gnupg-agent
-  - software-properties-common
-  - python-pip
+  - gnupg
   - openssl
 
 disk_setup:
@@ -26,6 +25,14 @@ fs_setup:
 
 mounts:
   - ["/dev/disk/azure/scsi1/lun1-part1", "/opt/data", auto, "defaults,noexec,nofail"]
+
+apt:
+  sources:
+    cratedb:
+      keyid: '90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB'
+      keyserver: 'https://cdn.crate.io/downloads/debian/DEB-GPG-KEY-crate'
+      source: 'deb [signed-by=$KEY_FILE] https://cdn.crate.io/downloads/debian/stable/ default main'
+
 
 write_files:
   - content: !!binary |
@@ -78,22 +85,7 @@ write_files:
       # Recommended memory settings for production:
       # - assign half of the OS memory to CrateDB
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
-      # - disable swapping my setting bootstrap.mlockall in crate.yml
-      # Run CRATE as this user ID and group ID
-      #CRATE_USER=crate
-      #CRATE_GROUP=crate
-      # Heap Size (defaults to 256m min, 1g max)
       CRATE_HEAP_SIZE=${crate_heap_size}g
-      # Maximum number of open files, defaults to 65535.
-      # MAX_OPEN_FILES=65535
-      # Maximum locked memory size. Set to "unlimited" if you use the
-      # bootstrap.mlockall option in crate.yml. You must also set
-      # CRATE_HEAP_SIZE.
-      MAX_LOCKED_MEMORY=unlimited
-      # Additional Java OPTS
-      # CRATE_JAVA_OPTS=
-      # Force the JVM to use IPv4 stack
-      CRATE_USE_IPV4=true
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -102,14 +94,12 @@ runcmd:
   - mkdir -p /opt/data
   - chmod 777 /opt/data
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
+  - chmod 755 /etc/crate/keystore.p12
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
-  - wget https://cdn.crate.io/downloads/deb/DEB-GPG-KEY-crate
-  - apt-key add DEB-GPG-KEY-crate
-  - add-apt-repository "deb https://cdn.crate.io/downloads/deb/stable/ $(lsb_release -cs) main"
-  - apt-get update -y
   - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
+  - systemctl start crate
   - bash /opt/deployment/finish.sh && rm -f /opt/deployment/finish.sh
 
 final_message: "The system is finally up, after $UPTIME seconds"
