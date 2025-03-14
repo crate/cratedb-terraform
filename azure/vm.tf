@@ -103,7 +103,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
   source_image_reference {
     publisher = "canonical"
     offer     = "ubuntu-24_04-lts"
-    sku       = "server-gen1"
+    sku       = "server"
     version   = "latest"
   }
 
