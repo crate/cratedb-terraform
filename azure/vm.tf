@@ -103,14 +103,14 @@ resource "azurerm_linux_virtual_machine" "crate" {
   source_image_reference {
     publisher = "canonical"
     offer     = "ubuntu-24_04-lts"
-    sku       = "server-gen1"
+    sku       = "server"
     version   = "latest"
   }
 
   os_disk {
     name                 = "OSdisk-crate-${count.index}"
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "StandardSSD_LRS"
   }
 
   admin_ssh_key {
