@@ -30,7 +30,7 @@ write_files:
       done
 
       sudo -i -u ec2-user bash << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
         source ~/.bashrc
 
         nvm install node --latest-npm
