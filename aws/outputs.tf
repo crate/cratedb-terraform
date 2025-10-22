@@ -15,7 +15,7 @@ output "cratedb_password" {
 }
 
 output "utility_vm_host" {
-  value       = aws_lb.loadbalancer.dns_name
+  value       = var.enable_utility_vm ? aws_instance.utilities[0].public_dns : null
   description = "If enabled, the utility VM can be reached using this hostname"
 }
 
