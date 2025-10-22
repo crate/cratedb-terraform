@@ -4,7 +4,7 @@ jobs:
   terraform_fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: hashicorp/setup-terraform@v3
       - run: terraform fmt -check -recursive
 
@@ -14,7 +14,7 @@ jobs:
       run:
         working-directory: aws
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init
       - run: tflint --format compact
@@ -25,13 +25,14 @@ jobs:
       run:
         working-directory: aws
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init
       - shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-central-1"
         run: |
           terraform test
 
@@ -41,7 +42,7 @@ jobs:
       run:
         working-directory: azure
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init
       - run: tflint --format compact
