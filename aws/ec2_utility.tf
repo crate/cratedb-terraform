@@ -136,11 +136,10 @@ resource "aws_instance" "utilities" {
   instance_type     = var.utility_vm.instance_type
   key_name          = var.ssh_keypair
   availability_zone = element(var.availability_zones, count.index)
-  user_data         = data.cloudinit_config.config_utilities.rendered
+  user_data_base64  = data.cloudinit_config.config_utilities.rendered
 
-  network_interface {
+  primary_network_interface {
     network_interface_id = aws_network_interface.utilities_interface[count.index].id
-    device_index         = 0
   }
 
   root_block_device {
@@ -148,7 +147,7 @@ resource "aws_instance" "utilities" {
   }
 
   lifecycle {
-    ignore_changes = [user_data, ami]
+    ignore_changes = [user_data_base64, ami]
   }
 
   tags = {

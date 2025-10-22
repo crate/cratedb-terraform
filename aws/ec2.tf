@@ -160,13 +160,12 @@ resource "aws_instance" "cratedb_node" {
   instance_type        = var.instance_type
   key_name             = var.ssh_keypair
   availability_zone    = element(var.availability_zones, count.index)
-  user_data            = data.cloudinit_config.config.rendered
+  user_data_base64     = data.cloudinit_config.config.rendered
   monitoring           = var.enable_utility_vm
   iam_instance_profile = var.instance_profile
 
-  network_interface {
+  primary_network_interface {
     network_interface_id = aws_network_interface.interface[count.index].id
-    device_index         = 0
   }
 
   root_block_device {
@@ -182,7 +181,7 @@ resource "aws_instance" "cratedb_node" {
   }
 
   lifecycle {
-    ignore_changes = [user_data, ami]
+    ignore_changes = [user_data_base64, ami]
   }
 
   tags = {
