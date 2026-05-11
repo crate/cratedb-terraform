@@ -129,6 +129,7 @@ resource "azurerm_managed_disk" "data_disk" {
   name                = "DataDisk-${count.index}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  zone                = azurerm_linux_virtual_machine.crate[count.index].platform_fault_domain
 
   storage_account_type = var.vm.storage_account_type
   create_option        = "Empty"
