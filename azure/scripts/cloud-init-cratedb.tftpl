@@ -87,6 +87,9 @@ write_files:
       # - assign half of the OS memory to CrateDB
       #   (e.g. 26g, stay below ~30G to benefit from CompressedOops)
       CRATE_HEAP_SIZE=${crate_heap_size}g
+
+      # Additional Java options
+      CRATE_JAVA_OPTS="-javaagent:/usr/share/crate/crate-jmx-exporter-1.2.4.jar=8080"
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -98,6 +101,7 @@ runcmd:
   - chmod 755 /etc/crate/keystore.p12
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
   - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
+  - curl --output-dir /usr/share/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
   - systemctl start crate
