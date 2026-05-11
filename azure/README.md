@@ -32,6 +32,7 @@ The main setup consists of the following steps:
 
         # Run "az account list-locations" for a full list
         location = "westeurope"
+        zone     = 1
       }
 
       # CrateDB-specific configuration
