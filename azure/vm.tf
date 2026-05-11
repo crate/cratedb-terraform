@@ -70,15 +70,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
-resource "azurerm_availability_set" "main" {
-  name                         = "AS-${local.config.component_name}"
-  location                     = azurerm_resource_group.rg.location
-  resource_group_name          = azurerm_resource_group.rg.name
-  platform_fault_domain_count  = 2
-  platform_update_domain_count = 2
-  managed                      = true
-}
-
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -91,10 +82,10 @@ resource "azurerm_linux_virtual_machine" "crate" {
   computer_name       = "node-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  zone                = var.config.zone
   size                = var.vm.size
 
   network_interface_ids = [azurerm_network_interface.crate[count.index].id]
-  availability_set_id   = azurerm_availability_set.main.id
 
   admin_username                  = var.vm.user
   disable_password_authentication = true
@@ -129,6 +120,7 @@ resource "azurerm_managed_disk" "data_disk" {
   name                = "DataDisk-${count.index}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  zone                = var.config.zone
 
   storage_account_type = var.vm.storage_account_type
   create_option        = "Empty"

@@ -2,6 +2,7 @@ variable "config" {
   type = object({
     environment  = string
     location     = string
+    zone         = string
     project_name = string
     owner        = string
     team         = string
