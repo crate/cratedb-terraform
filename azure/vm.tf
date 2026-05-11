@@ -133,5 +133,6 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
   virtual_machine_id = azurerm_linux_virtual_machine.crate[count.index].id
   lun                = 1
-  caching            = "ReadWrite"
+  # Disk caching is not supported by Azure for >= 4 TiB
+  caching = var.vm.disk_size_gb >= 4000 ? "None" : "ReadWrite"
 }
