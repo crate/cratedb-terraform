@@ -50,6 +50,16 @@ data "cloudinit_config" "config" {
   }
 }
 
+resource "azurerm_public_ip" "ip" {
+  count               = var.crate.cluster_size
+  name                = "IP-${local.config.component_name}-cratevm-${count.index}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+
+  sku = "Standard"
+}
+
 resource "azurerm_network_interface" "crate" {
   count               = var.crate.cluster_size
   name                = "NIC-${local.config.component_name}-cratevm-${count.index}"
@@ -60,6 +70,7 @@ resource "azurerm_network_interface" "crate" {
     name                          = "default"
     subnet_id                     = azurerm_subnet.sn.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.ip[count.index].id
   }
 }
 
