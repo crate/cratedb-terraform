@@ -23,9 +23,3 @@ output "azurevm_username" {
   value       = var.vm.user
   description = "User name to connect via SSH to the Azure VMs"
 }
-
-output "azurevm_private_key" {
-  value       = tls_private_key.ssh_key.private_key_pem
-  sensitive   = true
-  description = "Private key to connect via SSH to the Azure VMs"
-}

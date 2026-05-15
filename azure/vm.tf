@@ -81,11 +81,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
 resource "azurerm_linux_virtual_machine" "crate" {
   count = var.crate.cluster_size
 
@@ -117,7 +112,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
 
   admin_ssh_key {
     username   = var.vm.user
-    public_key = tls_private_key.ssh_key.public_key_openssh
+    public_key = file(var.ssh_public_key_path)
   }
 
   tags = {

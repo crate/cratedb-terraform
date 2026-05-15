@@ -61,6 +61,9 @@ The main setup consists of the following steps:
         # Username to connect via SSH to the nodes
         user = "cratedb-vmadmin"
       }
+
+      # The path to your existing SSH public key
+      ssh_public_key_path = "/home/user/.ssh/id_rsa.pub"
     }
 
     output "cratedb" {
