@@ -13,19 +13,25 @@ packages:
   - openssl
   - prometheus-node-exporter
 
-disk_setup:
-  /dev/disk/azure/scsi1/lun1:
-    table_type: gpt
-    layout: True
-    overwrite: True
+bootcmd:
+  - mkdir -p /opt/data
+  - |
+    # Wait for the data disk to become available
+    for i in $(seq 1 60); do
+      if [ -e /dev/disk/azure/data/by-lun/1 ]; then
+        break
+      fi
+      udevadm settle || true
+      sleep 2
+    done
 
 fs_setup:
-  - device: /dev/disk/azure/scsi1/lun1
-    partition: 1
+  - device: /dev/disk/azure/data/by-lun/1
     filesystem: xfs
+    overwrite: false
 
 mounts:
-  - ["/dev/disk/azure/scsi1/lun1-part1", "/opt/data", auto, "defaults,noexec,nofail"]
+  - ["/dev/disk/azure/data/by-lun/1", "/opt/data", "xfs", "defaults,noexec,nofail", "0", "2"]
 
 apt:
   sources:
@@ -33,7 +39,6 @@ apt:
       keyid: '90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB'
       keyserver: 'https://cdn.crate.io/downloads/debian/DEB-GPG-KEY-crate'
       source: 'deb [signed-by=$KEY_FILE] https://cdn.crate.io/downloads/debian/stable/ default main'
-
 
 write_files:
   - content: !!binary |
@@ -95,12 +100,11 @@ write_files:
     permissions: "0755"
 
 runcmd:
-  - mkdir -p /opt/data
-  - chmod 777 /opt/data
   - openssl pkcs12 -export -in /etc/crate/certificate.pem -inkey /etc/crate/private_key.pem -certfile /etc/crate/certificate.pem -out /etc/crate/keystore.p12 -passout pass:changeit
   - chmod 755 /etc/crate/keystore.p12
   - rm /etc/crate/certificate.pem && rm /etc/crate/private_key.pem
   - apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y crate
+  - systemctl enable crate
   - curl --output-dir /usr/share/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
   - chown -R crate:crate /opt/data
   - chmod 700 /opt/data
