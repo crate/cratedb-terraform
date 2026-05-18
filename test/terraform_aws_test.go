@@ -2,15 +2,18 @@ package test
 
 import (
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/gruntwork-io/terratest/modules/environment"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 func TestTerraformAws(t *testing.T) {
+	t.Parallel()
+
 	environment.RequireEnvVar(t, "AWS_TEST_REGION")
 	environment.RequireEnvVar(t, "AWS_TEST_VPC_ID")
 	environment.RequireEnvVar(t, "AWS_TEST_SSH_KEYPAIR")
@@ -19,23 +22,25 @@ func TestTerraformAws(t *testing.T) {
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../aws",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"region":             os.Getenv("AWS_TEST_REGION"),
 			"vpc_id":             os.Getenv("AWS_TEST_VPC_ID"),
 			"ssh_keypair":        os.Getenv("AWS_TEST_SSH_KEYPAIR"),
 			"subnet_ids":         os.Getenv("AWS_TEST_SUBNET_IDS"),
 			"availability_zones": os.Getenv("AWS_TEST_AVAILABILITY_ZONES"),
-			"config":             fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\"}", random.UniqueId()),
-			"crate":              "{heap_size_gb = 2, cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
+			"config":             fmt.Sprintf("{project_name = \"%s\", environment = \"test\", owner = \"Crate.IO\", team = \"Test Team\"}", random.UniqueID()),
+			"crate":              "{heap_size = \"2g\", cluster_name = \"cratedb\", cluster_size = 2, ssl_enable = true}",
 		},
 	})
 
-	defer terraform.Destroy(t, terraformOptions)
-	terraform.InitAndApply(t, terraformOptions)
+	// Clean up resources with "terraform destroy" at the end of the test.
+	defer terraform.DestroyContext(t, t.Context(), terraformOptions)
 
-	clusterUrl := terraform.Output(t, terraformOptions, "cratedb_application_url")
-	cratedbUsername := terraform.Output(t, terraformOptions, "cratedb_username")
-	cratedbPassword := terraform.Output(t, terraformOptions, "cratedb_password")
+	terraform.InitAndApplyContext(t, t.Context(), terraformOptions)
+
+	clusterUrl := terraform.OutputContext(t, t.Context(), terraformOptions, "cratedb_application_url")
+	cratedbUsername := terraform.OutputContext(t, t.Context(), terraformOptions, "cratedb_username")
+	cratedbPassword := terraform.OutputContext(t, t.Context(), terraformOptions, "cratedb_password")
 
 	// we don't validate the certificate explicitly, but check that the URL includes https
 	assert.Regexp(t, "https.*$", clusterUrl)
