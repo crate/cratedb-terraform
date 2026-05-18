@@ -63,6 +63,8 @@ write_files:
         cluster.initial_master_nodes:
             ${crate_nodes_ips}
 
+        node.name: ${crate_node_name}
+
         gateway.expected_data_nodes: ${crate_cluster_size}
         gateway.recover_after_data_nodes: ${crate_cluster_size}
 
@@ -90,7 +92,13 @@ write_files:
       CRATE_HEAP_SIZE=${crate_heap_size}
 
       # Additional Java options
-      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.2.4.jar=8080"
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.2.4.jar=8080%{if pyroscope_server != ""} -javaagent:/opt/crate/pyroscope.jar%{endif}"
+
+      %{if pyroscope_server != ""}
+      PYROSCOPE_APPLICATION_NAME=${crate_node_name}
+      PYROSCOPE_SERVER_ADDRESS=${pyroscope_server}
+      PYROSCOPE_PROFILER_ALLOC=512k
+      %{endif}
     owner: root:root
     path: /etc/default/crate
     permissions: "0755"
@@ -169,6 +177,7 @@ runcmd:
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
   - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
+  - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.5.2/pyroscope.jar
   - chown -R crate:crate /opt/crate
   - systemctl daemon-reload
   - systemctl enable crate
