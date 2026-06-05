@@ -4,22 +4,22 @@ terraform {
   required_providers {
     aws = {
       source  = "aws"
-      version = "~> 6.42"
+      version = "~> 6.49"
     }
 
     cloudinit = {
       source  = "cloudinit"
-      version = "~> 2.3"
+      version = "~> 2.4"
     }
 
     random = {
       source  = "random"
-      version = "~> 3.8"
+      version = "~> 3.9"
     }
 
     tls = {
       source  = "tls"
-      version = "~> 4.2"
+      version = "~> 4.3"
     }
   }
 }
