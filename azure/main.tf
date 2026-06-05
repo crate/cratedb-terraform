@@ -9,17 +9,17 @@ terraform {
 
     random = {
       source  = "random"
-      version = "~> 3.8"
+      version = "~> 3.9"
     }
 
     cloudinit = {
       source  = "cloudinit"
-      version = "~> 2.3"
+      version = "~> 2.4"
     }
 
     tls = {
       source  = "tls"
-      version = "~> 4.2"
+      version = "~> 4.3"
     }
   }
 }
