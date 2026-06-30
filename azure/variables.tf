@@ -53,3 +53,14 @@ variable "subscription_id" {
   type        = string
   description = "The Azure subscription ID"
 }
+
+variable "ssh_public_key_path" {
+  type        = string
+  description = "The path to an existing SSH public key to use for authentication when connecting via SSH to the VMs"
+}
+
+variable "pyroscope_server" {
+  type        = string
+  default     = ""
+  description = "An optional Pyroscope server URL to push metrics to"
+}

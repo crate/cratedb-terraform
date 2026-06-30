@@ -179,3 +179,9 @@ variable "prometheus_ssl" {
   default     = true
   description = "If true, a self-signed SSL certificate will be generated for accessing Prometheus."
 }
+
+variable "pyroscope_server" {
+  type        = string
+  default     = ""
+  description = "An optional Pyroscope server URL to push metrics to"
+}

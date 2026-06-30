@@ -31,6 +31,7 @@ resource "tls_self_signed_cert" "ssl" {
 }
 
 data "cloudinit_config" "config" {
+  count         = var.crate.cluster_size
   gzip          = true
   base64_encode = true
 
@@ -47,12 +48,14 @@ data "cloudinit_config" "config" {
         crate_heap_size        = var.crate.heap_size
         crate_cluster_name     = var.crate.cluster_name
         crate_cluster_size     = var.crate.cluster_size
+        crate_node_name        = "cratedb-${count.index}"
         crate_nodes_ips        = indent(12, yamlencode(aws_network_interface.interface[*].private_ip))
         crate_ssl_enable       = var.crate.ssl_enable
         crate_protocol         = var.crate.ssl_enable ? "https" : "http"
         crate_ssl_certificate  = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key  = base64encode(tls_private_key.ssl.private_key_pem)
         cratedb_user_settings  = indent(8, yamlencode(var.cratedb_settings))
+        pyroscope_server       = var.pyroscope_server
       }
     )
   }
@@ -160,7 +163,7 @@ resource "aws_instance" "cratedb_node" {
   instance_type        = var.instance_type
   key_name             = var.ssh_keypair
   availability_zone    = element(var.availability_zones, count.index)
-  user_data_base64     = data.cloudinit_config.config.rendered
+  user_data_base64     = data.cloudinit_config.config[count.index].rendered
   monitoring           = var.enable_utility_vm
   iam_instance_profile = var.instance_profile
 

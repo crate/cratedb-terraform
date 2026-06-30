@@ -27,6 +27,7 @@ resource "tls_self_signed_cert" "ssl" {
 }
 
 data "cloudinit_config" "config" {
+  count         = var.crate.cluster_size
   gzip          = true
   base64_encode = true
 
@@ -41,10 +42,12 @@ data "cloudinit_config" "config" {
         crate_heap_size       = var.crate.heap_size_gb
         crate_cluster_name    = var.crate.cluster_name
         crate_cluster_size    = var.crate.cluster_size
+        crate_node_name       = "cratedb-${count.index}"
         crate_nodes_ips       = indent(12, yamlencode(azurerm_network_interface.crate[*].private_ip_address))
         crate_ssl_enable      = var.crate.ssl_enable
         crate_ssl_certificate = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key = base64encode(tls_private_key.ssl.private_key_pem)
+        pyroscope_server      = var.pyroscope_server
       }
     )
   }
@@ -81,11 +84,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
 resource "azurerm_linux_virtual_machine" "crate" {
   count = var.crate.cluster_size
 
@@ -100,7 +98,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
 
   admin_username                  = var.vm.user
   disable_password_authentication = true
-  custom_data                     = data.cloudinit_config.config.rendered
+  custom_data                     = data.cloudinit_config.config[count.index].rendered
 
   source_image_reference {
     publisher = "canonical"
@@ -117,7 +115,7 @@ resource "azurerm_linux_virtual_machine" "crate" {
 
   admin_ssh_key {
     username   = var.vm.user
-    public_key = tls_private_key.ssh_key.public_key_openssh
+    public_key = file(var.ssh_public_key_path)
   }
 
   tags = {

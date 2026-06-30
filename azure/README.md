@@ -61,6 +61,9 @@ The main setup consists of the following steps:
         # Username to connect via SSH to the nodes
         user = "cratedb-vmadmin"
       }
+
+      # The path to your existing SSH public key
+      ssh_public_key_path = "/home/user/.ssh/id_rsa.pub"
     }
 
     output "cratedb" {
@@ -88,5 +91,4 @@ Please note that it might take a couple of minutes before VMs are fully provisio
 
 ## Accessing Azure VMs
 
-Azure VMs are not directly accessible as they have private IP addresses. To connect to them, use a [bastion host](https://docs.microsoft.com/en-us/azure/bastion/quickstart-host-portal). Please see `terraform output -json` for the user name and private key which are valid for all VMs.
-In the default configuration, SSH access is enabled in the network security group. It can be disabled if needed via the `vm.ssh_access` variable.
+Azure VMs are assigned a public IP address for easily connecting to them. In the default configuration, SSH access is enabled in the network security group. It can be disabled if needed via the `vm.ssh_access` variable.
