@@ -177,7 +177,7 @@ runcmd:
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
   - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
-  - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.5.2/pyroscope.jar
+  - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.6.0/pyroscope.jar
   - chown -R crate:crate /opt/crate
   - systemctl daemon-reload
   - systemctl enable crate
