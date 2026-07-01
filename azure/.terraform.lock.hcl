@@ -2,22 +2,22 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/hashicorp/azurerm" {
-  version     = "4.76.0"
+  version     = "4.79.0"
   constraints = "~> 4.0"
   hashes = [
-    "h1:4VD01UBYjsa3w7zeEBKnDtwClwpsPw6Dk+V9evhiKqU=",
-    "zh:07bb3a087abca8bd14cc28e3d3d4abb71e0ed711ecec65e7c0a2f1a97b948cf4",
-    "zh:0fa6640b5d6c0b0fe0b7fa25cebc0091b7dda2efd83ec0347c5a50dfce0957bc",
-    "zh:3c8618c8a5ab07fadfcb53ecf614f7b99e25bb6c407cf0af703a6b0647d4461d",
-    "zh:5f23fdda6ff290bc99b25b68f612bf67fbb503b04b1e38664e66d3204a51e99e",
-    "zh:68e6794cbe5e3b021657035c2465767b8296beed6c9acc8a9e032c4b90ba5746",
+    "h1:hEVrA2r7nS0jSd32CwsWNfifS8tV0xhoGuc1T9qU074=",
+    "zh:0129b3fa33289d54f86f150377b19127f85787116b7cc53564fed77c2e2468be",
+    "zh:131427cf40dd3fa4ec52af938b7ab0fd100bcacd75b7137c8e1ea5bf268c4638",
+    "zh:162ebd8f195ac28324d9e9f2e9b39a05d8a946abff21087a43123c83ca807a5d",
+    "zh:209a23777acdcfc674791a4ad37ba4e2110044857afb9db88aa305222fef706c",
+    "zh:21cf740e1fee936de429fa324b86af69c4fe90bbfdbb1f374e6a55118fdff841",
+    "zh:4ad1cde7ad4ef7187633b7fc7b0ed76ef2526b56fbb29f80a6fc54d07ac1204a",
+    "zh:57b942405b27af17cfad9a48d9e4ec75c0bb452f229dd132d6f1d8518ca4a067",
+    "zh:69a4fda56d6405027f303463f796a0d2d250403f67cecf2a25bcdfaeaf731630",
     "zh:78d5eefdd9e494defcb3c68d282b8f96630502cac21d1ea161f53cfe9bb483b3",
-    "zh:8a51dad112248d3fdfb19cdd65a182bd6a37e7fb7f1af801ab72a962813b5188",
-    "zh:945ff59c36de8c2128487f4ae0838655feef7c869112430ffa24ea69ff483b76",
-    "zh:b7306af0ecc8ad78771c17e0e911dd7a561251e4255ffe80516f0654a53f42bb",
-    "zh:c584de4858fc4ece330f1986f371acd235a5444e9b14ecea177779b1214539e0",
-    "zh:daa3675af21f8cdf330532af0b420287388f62ac57eaf0bd4c48e732d1052f35",
-    "zh:e76d972712b48a689f8deae41a3ad796c31d8b3798074d66c6f68e2b3b0aaa1f",
+    "zh:7c21524a423d95a4c84039e06a610f131c0618ee117da9c35e4b4f41d1210c64",
+    "zh:9045f6bb9f764709a5773d8ec65735f56c9995dc9c9ec3f85f2c6adf58654f3c",
+    "zh:e018581ed136640ba733ab583fd0072536b1bc096d66f2215787823cee6cfcdc",
   ]
 }
 

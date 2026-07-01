@@ -125,7 +125,7 @@ runcmd:
   - chown -R crate:crate /opt/data /etc/crate
   - chmod 700 /opt/data
   - curl --output-dir /usr/share/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
-  - curl --output-dir /usr/share/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.5.2/pyroscope.jar
+  - curl --output-dir /usr/share/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.6.0/pyroscope.jar
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/user_provisioning.sh "${crate_protocol}" "${crate_user}" "${crate_pass}" && rm -f /opt/deployment/user_provisioning.sh
