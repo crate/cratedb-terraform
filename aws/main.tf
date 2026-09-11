@@ -19,7 +19,7 @@ terraform {
 
     tls = {
       source  = "tls"
-      version = "~> 4.3"
+      version = "~> 4.4"
     }
   }
 }
