@@ -19,7 +19,7 @@ packages:
   - nano
 
 bootcmd:
-  - test -z "$(blkid /dev/nvme1n1)" && mkfs -t xfs -L data /dev/nvme1n1
+  - test -z "$(blkid /dev/sdh)" && mkfs -t xfs -L data /dev/sdh
   - mkdir -m 777 /opt/data
   - mount LABEL=data /opt/data
 
