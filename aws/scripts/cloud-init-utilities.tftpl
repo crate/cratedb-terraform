@@ -64,11 +64,25 @@ write_files:
           static_configs:
             - targets:
                 ${jmx_targets}
+              labels:
+                cratedb_cluster: cratedb
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "([^:]+):.*"
+              target_label: cratedb_node
+              replacement: "$1"
 
         - job_name: node_exporter
           static_configs:
             - targets:
                 ${node_exporter_targets}
+              labels:
+                cratedb_cluster: cratedb
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "([^:]+):.*"
+              target_label: cratedb_node
+              replacement: "$1"
 
         - job_name: sql_exporter
           # Preserve Prometheus 2 behavior for exporters without a valid Content-Type.
