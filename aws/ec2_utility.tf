@@ -118,7 +118,7 @@ data "aws_ami" "amazon_linux_utilities" {
 
   filter {
     name   = "name"
-    values = ["al2023-ami*"]
+    values = ["al2027-preview-ami*"]
   }
 
   filter {
