@@ -96,7 +96,7 @@ write_files:
       CRATE_HEAP_SIZE=${crate_heap_size}
 
       # Additional Java options
-      CRATE_JAVA_OPTS="-javaagent:/usr/share/crate/crate-jmx-exporter-1.2.4.jar=8080%{if pyroscope_server != ""} -javaagent:/usr/share/crate/pyroscope.jar%{endif}"
+      CRATE_JAVA_OPTS="-javaagent:/usr/share/crate/crate-jmx-exporter-1.2.5.jar=8080%{if pyroscope_server != ""} -javaagent:/usr/share/crate/pyroscope.jar%{endif}"
 
       %{if pyroscope_server != ""}
       PYROSCOPE_APPLICATION_NAME=${crate_node_name}
@@ -124,7 +124,7 @@ runcmd:
   - dnf install -y crate
   - chown -R crate:crate /opt/data /etc/crate
   - chmod 700 /opt/data
-  - curl --output-dir /usr/share/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.4/crate-jmx-exporter-1.2.4.jar
+  - curl --output-dir /usr/share/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.5/crate-jmx-exporter-1.2.5.jar
   - curl --output-dir /usr/share/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.6.0/pyroscope.jar
   - systemctl enable crate
   - systemctl start crate
