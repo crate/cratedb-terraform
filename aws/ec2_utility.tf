@@ -48,6 +48,8 @@ data "cloudinit_config" "config_utilities" {
         crate_user            = local.config.crate_username
         crate_password        = local.cratedb_password
         crate_ssl             = var.crate.ssl_enable
+        prometheus_version    = local.monitoring_versions.prometheus
+        sql_exporter_version  = local.monitoring_versions.sql_exporter
         prometheus_config     = indent(6, yamlencode(var.prometheus_ssl ? merge(local.prometheus_config, local.prometheus_ssl_config) : local.prometheus_config))
         sql_exporter_config   = indent(6, yamlencode(local.sql_exporter_config))
         jmx_targets           = indent(16, yamlencode(formatlist("%s:8080", aws_network_interface.interface[*].private_ip)))

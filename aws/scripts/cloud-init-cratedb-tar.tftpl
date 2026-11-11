@@ -4,18 +4,10 @@ package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 
-yum_repos:
-  prometheus-rpm:
-    baseurl: https://packagecloud.io/prometheus-rpm/release/el/9/$basearch
-    enabled: true
-    gpgcheck: false
-    gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
-    name: prometheus-rpm
-
 packages:
+  - tar
   - openssl
   - htop
-  - node_exporter
   - nano
 
 bootcmd:
@@ -27,6 +19,24 @@ mounts:
   - ["LABEL=data", "/opt/data", "xfs", "defaults,noexec,nofail"]
 
 write_files:
+  - content: |
+      [Unit]
+      Description=Prometheus Node Exporter
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=node_exporter
+      Group=node_exporter
+      ExecStart=/usr/local/bin/node_exporter
+      Restart=on-failure
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    path: /etc/systemd/system/node_exporter.service
+    permissions: "0644"
   - content: !!binary |
       ${crate_ssl_private_key}
     path: /opt/crate/config/private_key.pem
@@ -92,7 +102,7 @@ write_files:
       CRATE_HEAP_SIZE=${crate_heap_size}
 
       # Additional Java options
-      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-1.2.5.jar=8080%{if pyroscope_server != ""} -javaagent:/opt/crate/pyroscope.jar%{endif}"
+      CRATE_JAVA_OPTS="-javaagent:/opt/crate/crate-jmx-exporter-${jmx_exporter_version}.jar=8080%{if pyroscope_server != ""} -javaagent:/opt/crate/pyroscope.jar%{endif}"
 
       %{if pyroscope_server != ""}
       PYROSCOPE_APPLICATION_NAME=${crate_node_name}
@@ -176,14 +186,27 @@ runcmd:
   - tar -xf crate-*.tar.gz
   - mv -n crate-*/* /opt/crate
   - mv crate-*/config/log4j2.properties /opt/crate/config
-  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/1.2.5/crate-jmx-exporter-1.2.5.jar
-  - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v2.9.2/pyroscope.jar
+  - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/${jmx_exporter_version}/crate-jmx-exporter-${jmx_exporter_version}.jar
+  - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v${pyroscope_version}/pyroscope.jar
   - chown -R crate:crate /opt/crate
   - systemctl daemon-reload
   - systemctl enable crate
   - systemctl start crate
   - bash /opt/deployment/user_provisioning.sh "${crate_protocol}" "${crate_user}" "${crate_pass}" && rm -f /opt/deployment/user_provisioning.sh
-  - systemctl enable node_exporter.service
-  - systemctl start node_exporter.service
+  - |
+    set -eu
+    case "$(uname -m)" in
+      x86_64) archive_arch=amd64 ;;
+      aarch64) archive_arch=arm64 ;;
+      *) echo "Unsupported node_exporter architecture: $(uname -m)" >&2; exit 1 ;;
+    esac
+    install_dir=$(mktemp -d /var/tmp/node-exporter-install.XXXXXX)
+    trap 'rm -rf "$install_dir"' EXIT
+    curl --fail --location --retry 3 -o "$install_dir/node_exporter.tar.gz" "https://github.com/prometheus/node_exporter/releases/download/v${node_exporter_version}/node_exporter-${node_exporter_version}.linux-$archive_arch.tar.gz"
+    tar -xzf "$install_dir/node_exporter.tar.gz" -C "$install_dir"
+    install -m 0755 "$install_dir/node_exporter-${node_exporter_version}.linux-$archive_arch/node_exporter" /usr/local/bin/node_exporter
+    id node_exporter >/dev/null 2>&1 || useradd --system --user-group --no-create-home --shell /sbin/nologin node_exporter
+    systemctl daemon-reload
+    systemctl enable --now node_exporter.service
 
 final_message: "The system is finally up, after $UPTIME seconds"
