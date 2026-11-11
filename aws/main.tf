@@ -38,11 +38,11 @@ provider "aws" {
 
 locals {
   monitoring_versions = {
-    prometheus    = "3.16.0"
-    sql_exporter  = "0.24.13"
-    node_exporter = "1.12.1"
-    jmx_exporter  = "1.2.5"
-    pyroscope     = "2.9.2"
+    prometheus    = "3.16.0"  # https://prometheus.io/download/#prometheus
+    sql_exporter  = "0.24.13" # https://github.com/burningalchemist/sql_exporter/releases
+    node_exporter = "1.12.1"  # https://prometheus.io/download/#node_exporter
+    jmx_exporter  = "1.2.5"   # https://github.com/crate/jmx_exporter/releases
+    pyroscope     = "2.9.2"   # https://github.com/grafana/pyroscope-java/releases
   }
 
   config = {
