@@ -6,6 +6,7 @@ package_reboot_if_required: true
 
 packages:
   - tar
+  - policycoreutils
   - openssl
   - htop
   - nano
@@ -189,6 +190,8 @@ runcmd:
   - curl --output-dir /opt/crate -O https://repo1.maven.org/maven2/io/crate/crate-jmx-exporter/${jmx_exporter_version}/crate-jmx-exporter-${jmx_exporter_version}.jar
   - curl --output-dir /opt/crate -O https://github.com/grafana/pyroscope-java/releases/download/v${pyroscope_version}/pyroscope.jar
   - chown -R crate:crate /opt/crate
+  # Moving the extracted files preserves their old SELinux labels.
+  - restorecon -RF /opt/crate
   - systemctl daemon-reload
   - systemctl enable crate
   - systemctl start crate
