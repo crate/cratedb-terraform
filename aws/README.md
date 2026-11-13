@@ -24,7 +24,7 @@ The main setup consists of the following steps:
       config = {
         project_name = "example-project"
         environment  = "test"
-        owner        = "Crate.IO"
+        owner        = "CrateDB"
         team         = "Customer Engineering"
       }
 
