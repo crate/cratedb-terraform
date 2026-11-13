@@ -54,7 +54,7 @@ data "cloudinit_config" "config" {
         crate_protocol         = var.crate.ssl_enable ? "https" : "http"
         crate_ssl_certificate  = base64encode(tls_self_signed_cert.ssl.cert_pem)
         crate_ssl_private_key  = base64encode(tls_private_key.ssl.private_key_pem)
-        cratedb_user_settings  = indent(8, yamlencode(var.cratedb_settings))
+        cratedb_user_settings  = length(var.cratedb_settings) > 0 ? indent(8, yamlencode(var.cratedb_settings)) : ""
         pyroscope_server       = var.pyroscope_server
         node_exporter_version  = local.monitoring_versions.node_exporter
         jmx_exporter_version   = local.monitoring_versions.jmx_exporter
