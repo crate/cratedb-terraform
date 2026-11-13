@@ -24,7 +24,7 @@ The main setup consists of the following steps:
       config = {
         project_name = "example-project"
         environment  = "test"
-        owner        = "Crate.IO"
+        owner        = "CrateDB"
         team         = "Customer Engineering"
       }
 
@@ -33,7 +33,7 @@ The main setup consists of the following steps:
         # Java Heap size available to CrateDB
         heap_size = "2g"
 
-        cluster_name = "crate-cluster"
+        cluster_name = "cratedb-cluster"
 
         # The number of nodes the cluster will consist of
         cluster_size = 2

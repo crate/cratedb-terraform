@@ -4,20 +4,15 @@ package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 
-yum_repos:
-  prometheus-rpm:
-    baseurl: https://packagecloud.io/prometheus-rpm/release/el/9/$basearch
-    enabled: true
-    gpgcheck: false
-    gpgkey: https://packagecloud.io/prometheus-rpm/release/gpgkey
-    name: prometheus-rpm
-
 packages:
+  - tar
   - git
   - tmux
   - htop
   - nano
   - python3-pip
+  # Required by nodejs
+  - libatomic
 
 write_files:
   - content: |
@@ -30,7 +25,7 @@ write_files:
       done
 
       sudo -i -u ec2-user bash << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash
         source ~/.bashrc
 
         nvm install node --latest-npm
@@ -69,11 +64,25 @@ write_files:
           static_configs:
             - targets:
                 ${jmx_targets}
+              labels:
+                cratedb_cluster: cratedb
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "([^:]+):.*"
+              target_label: cratedb_node
+              replacement: "$1"
 
         - job_name: node_exporter
           static_configs:
             - targets:
                 ${node_exporter_targets}
+              labels:
+                cratedb_cluster: cratedb
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: "([^:]+):.*"
+              target_label: cratedb_node
+              replacement: "$1"
 
         - job_name: sql_exporter
           static_configs:
@@ -101,17 +110,75 @@ write_files:
       ${prometheus_config}
     path: /etc/prometheus/web.yml
   - content: |
-      basic_auth_users:
-        PROMETHEUS_OPTS='--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/data --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.config.file=/etc/prometheus/web.yml'
-    path: /etc/default/prometheus
+      [Unit]
+      Description=Prometheus
+      Documentation=https://prometheus.io/docs/
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=prometheus
+      Group=prometheus
+      ExecStartPre=/usr/local/bin/promtool check config /etc/prometheus/prometheus.yml
+      ExecStart=/usr/local/bin/prometheus \
+        --config.file=/etc/prometheus/prometheus.yml \
+        --storage.tsdb.path=/var/lib/prometheus/data \
+        --web.config.file=/etc/prometheus/web.yml
+      ExecReload=/bin/kill -HUP $MAINPID
+      Restart=on-failure
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    path: /etc/systemd/system/prometheus.service
+    permissions: "0644"
+  - content: |
+      [Unit]
+      Description=SQL Exporter
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=sql_exporter
+      Group=sql_exporter
+      WorkingDirectory=/etc/prometheus
+      ExecStart=/usr/local/bin/sql_exporter --config.file=/etc/prometheus/sql_exporter.yml
+      Restart=on-failure
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    path: /etc/systemd/system/sql_exporter.service
+    permissions: "0644"
 
 runcmd:
   - /root/node.sh
   - mv /root/.env /home/ec2-user/nodeIngestBench/.env
   - chown ec2-user:ec2-user /home/ec2-user/nodeIngestBench/.env
-  - dnf install -y prometheus2
-  - systemctl enable prometheus.service
-  - systemctl start prometheus.service
-  - dnf install -y sql_exporter
-  - systemctl enable sql_exporter.service
-  - systemctl start sql_exporter.service
+  - |
+    set -eu
+    case "$(uname -m)" in
+      x86_64) archive_arch=amd64 ;;
+      aarch64) archive_arch=arm64 ;;
+      *) echo "Unsupported Prometheus architecture: $(uname -m)" >&2; exit 1 ;;
+    esac
+    install_dir=$(mktemp -d /var/tmp/prometheus-install.XXXXXX)
+    trap 'rm -rf "$install_dir"' EXIT
+    curl --fail --location --retry 3 -o "$install_dir/prometheus.tar.gz" "https://github.com/prometheus/prometheus/releases/download/v${prometheus_version}/prometheus-${prometheus_version}.linux-$archive_arch.tar.gz"
+    tar -xzf "$install_dir/prometheus.tar.gz" -C "$install_dir"
+    install -m 0755 "$install_dir/prometheus-${prometheus_version}.linux-$archive_arch/prometheus" /usr/local/bin/prometheus
+    install -m 0755 "$install_dir/prometheus-${prometheus_version}.linux-$archive_arch/promtool" /usr/local/bin/promtool
+    id prometheus >/dev/null 2>&1 || useradd --system --user-group --home-dir /var/lib/prometheus --shell /sbin/nologin prometheus
+    install -d -o prometheus -g prometheus -m 0755 /var/lib/prometheus/data
+
+    curl --fail --location --retry 3 -o "$install_dir/sql_exporter.tar.gz" "https://github.com/burningalchemist/sql_exporter/releases/download/${sql_exporter_version}/sql_exporter-${sql_exporter_version}.linux-$archive_arch.tar.gz"
+    tar -xzf "$install_dir/sql_exporter.tar.gz" -C "$install_dir"
+    install -m 0755 "$install_dir/sql_exporter-${sql_exporter_version}.linux-$archive_arch/sql_exporter" /usr/local/bin/sql_exporter
+    id sql_exporter >/dev/null 2>&1 || useradd --system --user-group --no-create-home --shell /sbin/nologin sql_exporter
+    chown root:sql_exporter /etc/prometheus/sql_exporter.yml
+    chmod 0640 /etc/prometheus/sql_exporter.yml
+
+    systemctl daemon-reload
+    systemctl enable --now prometheus.service sql_exporter.service

@@ -9,7 +9,7 @@ variable "config" {
   default = {
     project_name = "example-project"
     environment  = "test"
-    owner        = "Crate.IO"
+    owner        = "CrateDB"
     team         = "Customer Engineering"
   }
 
